@@ -110,6 +110,20 @@ wget http://cdn.mysql.com/Downloads/MySQLGUITools/mysql-workbench-community_8.0.
 sudo dpkg -i mysql-workbench-community.deb
 sudo apt-get -f install -y
 
+#Cisco PacketTracer
+wget --no-check-certificate https://nuvem.ufba.br/s/Ow8tXCyToVaAFrS/download -O /opt/ciscopackettracer.deb
+cd /opt
+sudo apt-get install ./ciscopackettracer.deb -y
+rm ciscopackettracer.deb
+
+
+#Nand2Tetris
+sudo apt-get install unzip
+wget --no-check-certificate https://nuvem.ufba.br/s/ykUB6F81M5z2Ef1/download -O /opt/nand2tetris.zip
+cd /opt
+unzip nand2tetris.zip
+rm nand2tetris.zip
+
 #mongodb
 
 if ! [ -f /etc/mongod.conf ]; then
