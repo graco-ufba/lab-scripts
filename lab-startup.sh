@@ -38,38 +38,40 @@ logrotate -f /etc/logrotate.d/custom_logs
 echo "Logrotate configuration has been set up successfully."
 
 ############### Criação do usuário aluno ###############
-
-
-#define a logo da tomorrow como wallpaper em novos usuários
-
-if ! [ -f /usr/share/backgrounds/tomorrow.png ]; then
-wget "https://drive.google.com/uc?export=download&id=1wafIeHXEffGtEbRNfBcsNisgLdNXoqWq" -O /usr/share/backgrounds/tomorrow.png
-fi
-
-ARQUIVO="/etc/skel/.profile"
-CONTEUDO="~/set-wallpaper.sh"
-
-if ! grep -q "$CONTEUDO" "$ARQUIVO"; then
-    echo "$CONTEUDO" >> "$ARQUIVO"
-    echo "Conteúdo adicionado com sucesso!"
-else
-    echo "O conteúdo já existe no arquivo."
-fi
-
-
-if ! [ -f /etc/skel/set-wallpaper.sh ]; then
-sudo touch /etc/skel/set-wallpaper.sh
-echo "gsettings set org.gnome.desktop.background picture-uri file:///usr/share/backgrounds/tomorrow.png
-gsettings set org.gnome.desktop.session idle-delay 0
-gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'shutdown'
-gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 7200
-" > /etc/skel/set-wallpaper.sh
-chmod +x /etc/skel/set-wallpaper.sh
+#Removendo lixo
+if [ -f /etc/skel/set-wallpaper.sh ]; then
+rm /etc/skel/set-wallpaper.sh
 fi
 
 if  [ -f /etc/profile.d/autologout.sh ]; then
 sudo rm -f /etc/profile.d/autologout.sh
 fi
+
+#Configuração do display
+if ! [ -f /usr/share/backgrounds/tomorrow.png ]; then
+wget "https://drive.google.com/uc?export=download&id=1wafIeHXEffGtEbRNfBcsNisgLdNXoqWq" -O /usr/share/backgrounds/tomorrow.png
+fi
+
+if ! [ -f /etc/profile.d/config_display.sh ]; then
+sudo touch /etc/profile.d/confif_display.sh
+echo "gsettings set org.gnome.desktop.background picture-uri file:///usr/share/backgrounds/tomorrow.png
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'logout'
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 3600
+gsettings set org.gnome.desktop.session idle-delay 0
+" > /etc/profile.d/config_display.sh
+chmod a+x /etc/profile.d/config_display.sh
+fi
+
+#Configuração de desligamento das máquinas
+PATH_TO_SHUTDOWN=$(which shutdown)
+TARGET_HOUR="33 22 * * * root "$PATH_TO_SHUTDOWN" -h now"
+FILE="/etc/crontab"
+
+if ! grep -q -x -F "$TARGET_HOUR" "$FILE"
+then
+        echo "$TARGET_HOUR" >> /etc/crontab
+fi
+
 
 # Pula configuração do Ubuntu pelo usuário novo
 rm -f /usr/share/applications/gnome-online-accounts-panel.desktop
