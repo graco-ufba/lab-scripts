@@ -33,7 +33,7 @@ if [[ "$USER" == "aluno" ]]; then
         sudo -u grant all privileges on *.* to 'aluno'@'localhost';
 
         inventory_path="/etc/gdm3/PostLogin/inventory_script-master"
-        inventory_url='https://inventory-server-ivory.vercel.app/inventory'
+        inventory_url='https://inventario.app.ic.ufba.br/inventory'
         python3 $inventory_path/src/inventory.py $inventory_url &> /var/log/inventory.log
 fi
 exit 0

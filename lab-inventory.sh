@@ -3,7 +3,7 @@
 # (add version to trigger update in 'lab-startup' cmp)
 
 inventory_path="/etc/gdm3/PostLogin/inventory_script-master"
-inventory_url='https://inventory-server-ivory.vercel.app/inventory'
+inventory_url='https://inventario.app.ic.ufba.br/inventory'
 
 ###### Instalação do script de inventário ######
 wget -O inventory.zip https://github.com/valdineifer/inventory_script/archive/refs/heads/master.zip
