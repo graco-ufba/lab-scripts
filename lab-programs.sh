@@ -61,6 +61,28 @@ sudo apt install snapd
 sudo apt install -y openjdk-17-jdk
 sudo snap install netbeans --classic
 
+
+#Megatools
+sudo apt install megatools -y
+
+#SimulIDE
+megadl "https://mega.nz/file/8akRDCYJ#8Fvn6U9RIJ-sX_f49fCsn05YTUr5ySNycoFlxVFX-iE"
+tar -xzvf SimulIDE_1.1.0-SR1_Lin64.tar.gz && rm SimulIDE_1.1.0-SR1_Lin64.tar.gz
+sudo apt update
+sudo apt install fuse libfuse2 -y
+sudo apt install libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libqt5svg5 qtbase5-dev qttools5-dev-tools libqt5serialport5 libqt5serialport5-dev -y
+
+#Atmel AVRA
+sudo apt-get install avrdude avra -y
+cd $HOME
+git clone https://github.com/lpodkalicki/blog.git
+cd $HOME/blog/avr/attiny13/043_blinky_with_delay_function_asm
+make
+cd $HOME/blog/avr/attiny13/043_blinky_with_delay_function_asm
+make flash
+sudo wget https://raw.githubusercontent.com/DarkSector/AVR/master/asm/include/m16def.inc -y
+
+
 #wine
 sudo apt install wine64 -y
 
