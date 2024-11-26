@@ -82,6 +82,9 @@ cd $HOME/blog/avr/attiny13/043_blinky_with_delay_function_asm
 make flash
 sudo wget https://raw.githubusercontent.com/DarkSector/AVR/master/asm/include/m16def.inc -y
 
+#Arduino IDE
+sudo snap install arduino
+sudo usermod -a -G dialout aluno
 
 #wine
 sudo apt install wine64 -y
