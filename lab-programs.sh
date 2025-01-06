@@ -221,7 +221,6 @@ if ! dpkg -l | grep -q frame0; then
   wget https://files.frame0.app/releases/linux/x64/frame0_1.0.0~beta.8_amd64.deb -O /tmp/frame0.deb
   sudo dpkg -i /tmp/frame0.deb
   sudo apt-get -f install -y
-  sudo dpkg -i /tmp/frame0.deb
   rm /tmp/frame0.deb
 fi
 
