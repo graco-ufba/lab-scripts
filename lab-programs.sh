@@ -211,10 +211,11 @@ if [ -f /etc/init.d/aluno.sh ]; then
 fi
 
 #unityhub
+sudo add-apt-repository -y ppa:dotnet/backports
 wget -qO - https://hub.unity3d.com/linux/keys/public | gpg --dearmor | sudo tee /usr/share/keyrings/Unity_Technologies_ApS.gpg > /dev/null
 sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/Unity_Technologies_ApS.gpg] https://hub.unity3d.com/linux/repos/deb stable main" > /etc/apt/sources.list.d/unityhub.list'
 sudo apt update -y
-sudo apt-get install -y unityhub
+sudo apt-get install -y unityhub dotnet-sdk-9.0
 
 # Frame0
 if ! dpkg -l | grep -q frame0; then
