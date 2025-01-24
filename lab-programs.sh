@@ -213,8 +213,10 @@ fi
 #unityhub
 wget -qO - https://hub.unity3d.com/linux/keys/public | gpg --dearmor | sudo tee /usr/share/keyrings/Unity_Technologies_ApS.gpg > /dev/null
 sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/Unity_Technologies_ApS.gpg] https://hub.unity3d.com/linux/repos/deb stable main" > /etc/apt/sources.list.d/unityhub.list'
-sudo apt update
-sudo apt-get install unityhub
+sudo apt update -y
+sudo apt-get install -y unityhub
+mkdir -p /opt/unity
+chown -R aluno:aluno /opt/unity
 
 # Frame0
 if ! dpkg -l | grep -q frame0; then
