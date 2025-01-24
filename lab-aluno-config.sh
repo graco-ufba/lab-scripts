@@ -19,6 +19,9 @@ if [[ "$USER" == "aluno" ]]; then
         chown -R aluno:aluno /opt/nand2tetris
         chown -R aluno:aluno /opt/VMs
 
+        mkdir -p /home/$USER/Unity/Hub
+        ln -s /opt/Unity /home/$USER/Unity/Hub/Editor
+
    	ln -s /opt/gradle /home/$USER/.gradle
     	ln -s /opt/npm /home/$USER/.npm
         ln -s /opt/VMs /home/$USER/VirtualBox
