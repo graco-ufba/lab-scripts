@@ -35,6 +35,9 @@ else
   	if ! cmp -s /usr/local/sbin/lab-inventory.sh /tmp/lab-inventory.sh; then
 	sudo echo "false" > /usr/local/sbin/done.txt
 	fi
+ 	if ! cmp -s /usr/local/sbin/lab-admin-profile-config.sh /tmp/lab-admin-profile-config.sh; then
+	sudo echo "false" > /usr/local/sbin/done.txt
+	fi
 fi
 
 DONE=$(cat /usr/local/sbin/done.txt)
@@ -46,6 +49,7 @@ if [ "$DONE" = "false" ]; then
 	sudo cp /tmp/lab-eula-programs.sh /usr/local/sbin
  	sudo cp /tmp/lab-program-config.sh /usr/local/sbin
 	sudo cp /tmp/lab-inventory.sh /usr/local/sbin
+ 	sudo cp /tmp/lab-admin-profile-config.sh /usr/local/sbin
 
 	chmod 755 /usr/local/sbin/lab-profile-config.sh
 	chmod 755 /usr/local/sbin/lab-aluno-config.sh
@@ -53,6 +57,7 @@ if [ "$DONE" = "false" ]; then
 	chmod 755 /usr/local/sbin/lab-eula-programs.sh
  	chmod 755 /usr/local/sbin/lab-program-config.sh
 	chmod 755 /usr/local/sbin/lab-inventory.sh
+ 	chmod 755 /usr/local/sbin/lab-admin-profile-config.sh
 
 	/usr/local/sbin/lab-profile-config.sh
 	/usr/local/sbin/lab-aluno-config.sh
@@ -60,7 +65,7 @@ if [ "$DONE" = "false" ]; then
 	/usr/local/sbin/lab-eula-programs.sh
  	/usr/local/sbin/lab-program-config.sh
 	/usr/local/sbin/lab-inventory.sh
- 	
+ 	/usr/local/sbin/lab-admin-profile-config.sh
 
 	echo "SCRIPTS ATUALIZADOS"
  	sudo echo "true" > /usr/local/sbin/done.txt
