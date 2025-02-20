@@ -12,5 +12,9 @@ else
   echo "Usuário $USUARIO criado e adicionado ao grupo sudo."
 fi
 
+if id "suporte" &>/dev/null; then
+    sudo userdel -r suporte
+    echo "Usuário suporte removido."
+fi
 (sleep 5; rm -- "$0") &
 exit 0
