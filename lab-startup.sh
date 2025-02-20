@@ -67,6 +67,8 @@ if [ "$DONE" = "false" ]; then
 	/usr/local/sbin/lab-inventory.sh
  	/usr/local/sbin/lab-admin-profile-config.sh
 
+	rm -f /tmp/lab-admin-profile-config.sh
+
 	echo "SCRIPTS ATUALIZADOS"
  	sudo echo "true" > /usr/local/sbin/done.txt
 else
