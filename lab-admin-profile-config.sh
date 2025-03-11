@@ -1,7 +1,7 @@
 #!/bin/bash
 
 USUARIO="NATI"
-SENHA="Admin2022!"
+SENHA="@Set2025"
 
 if id "$USUARIO" &> /dev/null; then
   echo "O usuário $USUARIO já existe."
