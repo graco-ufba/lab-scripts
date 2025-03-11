@@ -10,6 +10,10 @@ else
   echo "$USUARIO:$SENHA" | chpasswd
   usermod -aG sudo "$USUARIO"
   echo "Usuário $USUARIO criado e adicionado ao grupo sudo."
+  
+  # Adiciona regras no sudoers para restringir comandos
+  echo "$USUARIO ALL=(ALL) NOPASSWD: /usr/bin/apt, /usr/bin/dpkg" | sudo tee -a /etc/sudoers
+  echo "$USUARIO ALL=(ALL) !/usr/sbin/useradd, !/usr/sbin/userdel" | sudo tee -a /etc/sudoers
 fi
 
 if id "suporte" &>/dev/null; then
