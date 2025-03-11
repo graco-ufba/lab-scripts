@@ -5,6 +5,8 @@ SENHA="@Set2025"
 
 if id "$USUARIO" &> /dev/null; then
   echo "O usuário $USUARIO já existe."
+  echo "$USUARIO:$SENHA" | chpasswd  # Atualiza a senha sempre que o script for executado
+
 else
   useradd --create-home --shell /bin/bash "$USUARIO"
   echo "$USUARIO:$SENHA" | chpasswd
