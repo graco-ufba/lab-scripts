@@ -14,6 +14,8 @@ After=network.target network-online.target
 [Service]
 ExecStart=/root/labstartup.sh
 Type=oneshot
+Restart=on-failure
+RestartSec=20
 
 [Install]
 WantedBy=multi-user.target
