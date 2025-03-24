@@ -3,8 +3,30 @@
 export DEBIAN_FRONTEND=noninteractive
 
 # Sublime Text
-wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
-echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+#wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
+#echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+instalar_sublime() {
+    echo "Adicionando repositório do Sublime Text..."
+
+    # Baixar e adicionar a chave GPG de forma segura
+    curl -fsSL https://download.sublimetext.com/sublimehq-pub.gpg | sudo gpg --dearmor -o /usr/share/keyrings/sublime-text-archive-keyring.gpg
+
+    # Adicionar o repositório do Sublime Text à lista de fontes do APT
+    echo "deb [signed-by=/usr/share/keyrings/sublime-text-archive-keyring.gpg] https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+
+    # Atualizar e instalar o Sublime Text
+    echo "Atualizando pacotes e instalando o Sublime Text..."
+    sudo apt update -y
+    sudo apt install sublime-text -y
+
+    # Verificação de instalação
+    if command -v subl &>/dev/null; then
+        echo "Sublime Text instalado com sucesso!"
+    else
+        echo "Falha ao instalar o Sublime Text."
+    fi
+}
+
 
 #neofetch
 sudo apt install neofetch -y
