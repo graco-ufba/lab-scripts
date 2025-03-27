@@ -88,11 +88,26 @@ sudo snap install netbeans --classic
 sudo apt install megatools -y
 
 #SimulIDE
+#megadl "https://mega.nz/file/8akRDCYJ#8Fvn6U9RIJ-sX_f49fCsn05YTUr5ySNycoFlxVFX-iE"
+#tar -xzvf SimulIDE_1.1.0-SR1_Lin64.tar.gz && rm SimulIDE_1.1.0-SR1_Lin64.tar.gz
+#sudo apt update
+#sudo apt install fuse libfuse2 -y
+#sudo apt install libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libqt5svg5 qtbase5-dev qttools5-dev-tools libqt5serialport5 libqt5serialport5-dev -y
+
+# Instalação do SimulIDE
+echo "Baixando e instalando SimulIDE..."
+sudo apt install megatools -y
 megadl "https://mega.nz/file/8akRDCYJ#8Fvn6U9RIJ-sX_f49fCsn05YTUr5ySNycoFlxVFX-iE"
 tar -xzvf SimulIDE_1.1.0-SR1_Lin64.tar.gz && rm SimulIDE_1.1.0-SR1_Lin64.tar.gz
 sudo apt update
 sudo apt install fuse libfuse2 -y
 sudo apt install libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libqt5svg5 qtbase5-dev qttools5-dev-tools libqt5serialport5 libqt5serialport5-dev -y
+
+# Configurar permissão de execução e criar atalho
+chmod +x SimulIDE_1.1.0-SR1_Lin64/simulide
+ln -sf "$PWD/SimulIDE_1.1.0-SR1_Lin64/simulide" /usr/local/bin/simulide
+
+
 
 #Atmel AVRA
 sudo apt-get install avrdude avra -y
