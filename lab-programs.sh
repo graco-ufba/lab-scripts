@@ -110,14 +110,30 @@ ln -sf "$PWD/SimulIDE_1.1.0-SR1_Lin64/simulide" /usr/local/bin/simulide
 
 
 #Atmel AVRA
+#sudo apt-get install avrdude avra -y
+#cd $HOME
+#git clone https://github.com/lpodkalicki/blog.git
+#cd $HOME/blog/avr/attiny13/043_blinky_with_delay_function_asm
+#make
+#cd $HOME/blog/avr/attiny13/043_blinky_with_delay_function_asm
+#make flash
+#sudo wget https://raw.githubusercontent.com/DarkSector/AVR/master/asm/include/m16def.inc -y
+
+#Atmel AVRA
+sudo apt-get update -y
 sudo apt-get install avrdude avra -y
+cd $HOME
+wget https://sourceforge.net/projects/avra/files/1.3.0/avra_1.3.0_linux.tar.gz
+tar -xvzf avra_1.3.0_linux.tar.gz
+cd avra_1.3.0
+sudo cp avra /usr/local/bin/
 cd $HOME
 git clone https://github.com/lpodkalicki/blog.git
 cd $HOME/blog/avr/attiny13/043_blinky_with_delay_function_asm
 make
-cd $HOME/blog/avr/attiny13/043_blinky_with_delay_function_asm
 make flash
-sudo wget https://raw.githubusercontent.com/DarkSector/AVR/master/asm/include/m16def.inc -y
+sudo wget https://raw.githubusercontent.com/DarkSector/AVR/master/asm/include/m16def.inc -O /usr/local/include/m16def.inc
+
 
 #Arduino IDE
 sudo snap install arduino
