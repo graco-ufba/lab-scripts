@@ -64,9 +64,9 @@ sudo unzip pt.zip
 sudo rm /etc/skel/pt.zip
 fi
 
-# Instalação do Android Studio
+# Instalação do Android SDK, Android Studio (via Snap) e Gradle
 if ! [ -f /usr/local/sbin/android.sh ]; then
-  echo "Instalando Android SDK e Android Studio..."
+  echo "Instalando Android SDK, Android Studio e Gradle..."
 
   # Instala o Android SDK
   if [[ ! -d /opt/Android ]]; then
@@ -75,31 +75,21 @@ if ! [ -f /usr/local/sbin/android.sh ]; then
 
     echo "Extraindo Android SDK em /opt..."
     cd /opt || exit 1
-    tar xjf /tmp/Android.tar.bz2
+    sudo tar xjf /tmp/Android.tar.bz2
     rm /tmp/Android.tar.bz2
 
     echo "Criando link simbólico em /etc/skel..."
     cd /etc/skel || exit 1
-    unlink Android 2>/dev/null
-    ln -s /opt/Android Android
+    sudo unlink Android 2>/dev/null
+    sudo ln -s /opt/Android Android
   fi
 
-  # Instala o Android Studio
-  if [[ ! -d /opt/android-studio ]]; then
-    echo "Baixando Android Studio..."
-    wget https://nuvem.ufba.br/s/6BUVDGWKKMxR6Fj/download --no-check-certificate -O /tmp/android-studio.tar.bz2
-
-    echo "Extraindo Android Studio em /opt..."
-    cd /opt || exit 1
-    tar xjf /tmp/android-studio.tar.bz2
-
-    # Ajuste se o conteúdo estiver em subpasta
-    if [[ -d /opt/android-studio/android-studio ]]; then
-      mv /opt/android-studio/android-studio/* /opt/android-studio/
-      rmdir /opt/android-studio/android-studio
-    fi
-
-    rm /tmp/android-studio.tar.bz2
+  # Instala o Android Studio via Snap
+  if ! snap list | grep -q android-studio; then
+    echo "Instalando Android Studio via Snap..."
+    sudo snap install android-studio --classic
+  else
+    echo "Android Studio já está instalado via Snap."
   fi
 
   # Instala o Gradle
@@ -109,9 +99,9 @@ if ! [ -f /usr/local/sbin/android.sh ]; then
 
     echo "Extraindo Gradle em /opt..."
     cd /opt || exit 1
-    tar xjf /tmp/gradle.tar.bz2
-    mv .gradle gradle
-    chown -R aluno:aluno gradle
+    sudo tar xjf /tmp/gradle.tar.bz2
+    sudo mv .gradle gradle
+    sudo chown -R aluno:aluno gradle
     rm /tmp/gradle.tar.bz2
   fi
 
