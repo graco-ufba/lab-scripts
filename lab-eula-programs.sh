@@ -64,5 +64,63 @@ sudo unzip pt.zip
 sudo rm /etc/skel/pt.zip
 fi
 
+# Instalação do Android Studio
+if ! [ -f /usr/local/sbin/android.sh ]; then
+  echo "Instalando Android SDK e Android Studio..."
+
+  # Instala o Android SDK
+  if [[ ! -d /opt/Android ]]; then
+    echo "Baixando Android SDK..."
+    wget https://nuvem.ufba.br/s/FjNaDukULOwHhs4/download --no-check-certificate -O /tmp/Android.tar.bz2
+
+    echo "Extraindo Android SDK em /opt..."
+    cd /opt || exit 1
+    tar xjf /tmp/Android.tar.bz2
+    rm /tmp/Android.tar.bz2
+
+    echo "Criando link simbólico em /etc/skel..."
+    cd /etc/skel || exit 1
+    unlink Android 2>/dev/null
+    ln -s /opt/Android Android
+  fi
+
+  # Instala o Android Studio
+  if [[ ! -d /opt/android-studio ]]; then
+    echo "Baixando Android Studio..."
+    wget https://nuvem.ufba.br/s/6BUVDGWKKMxR6Fj/download --no-check-certificate -O /tmp/android-studio.tar.bz2
+
+    echo "Extraindo Android Studio em /opt..."
+    cd /opt || exit 1
+    tar xjf /tmp/android-studio.tar.bz2
+
+    # Ajuste se o conteúdo estiver em subpasta
+    if [[ -d /opt/android-studio/android-studio ]]; then
+      mv /opt/android-studio/android-studio/* /opt/android-studio/
+      rmdir /opt/android-studio/android-studio
+    fi
+
+    rm /tmp/android-studio.tar.bz2
+  fi
+
+  # Instala o Gradle
+  if [[ ! -d /opt/gradle ]]; then
+    echo "Baixando Gradle..."
+    wget https://nuvem.ufba.br/s/U5anBL3tRpN2xhT/download --no-check-certificate -O /tmp/gradle.tar.bz2
+
+    echo "Extraindo Gradle em /opt..."
+    cd /opt || exit 1
+    tar xjf /tmp/gradle.tar.bz2
+    mv .gradle gradle
+    chown -R aluno:aluno gradle
+    rm /tmp/gradle.tar.bz2
+  fi
+
+  # Marca que o Android Studio foi instalado
+  sudo touch /usr/local/sbin/android.sh
+
+  echo "Android Studio instalado com sucesso."
+else
+  echo "Android Studio já está instalado (/usr/local/sbin/android.sh encontrado)."
+fi
 
 exit 0
