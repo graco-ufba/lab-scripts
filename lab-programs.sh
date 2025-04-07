@@ -234,35 +234,89 @@ fi
 ##################################
 
 # Instala o Android SDK e Android Studio
-if [[ ! -d /opt/Android ]]; then
-  wget https://nuvem.ufba.br/s/FjNaDukULOwHhs4/download --no-check-certificate -O /tmp/Android.tar.bz2
-  cd /opt
-  tar xjf /tmp/Android.tar.bz2
-  rm /tmp/Android.tar.bz2
-  cd /etc/skel
-  unlink Android
-  ln -s /opt/Android .
-fi
-if [[ ! -d /opt/android-studio ]]; then
-  wget https://nuvem.ufba.br/s/6BUVDGWKKMxR6Fj/download --no-check-certificate -O /tmp/android-studio.tar.bz2
-  cd /opt
-  tar xjf /tmp/android-studio.tar.bz2
-  rm /tmp/android-studio.tar.bz2
+
+#!/bin/bash
+
+# Instalação do Android SDK, Android Studio (via Snap) e Gradle
+if ! [ -f /usr/local/sbin/android.sh ]; then
+  echo "Instalando Android SDK, Android Studio e Gradle..."
+
+  # Instala o Android SDK
+  if [[ ! -d /opt/Android ]]; then
+    echo "Baixando Android SDK..."
+    wget https://nuvem.ufba.br/s/FjNaDukULOwHhs4/download --no-check-certificate -O /tmp/Android.tar.bz2
+
+    echo "Extraindo Android SDK em /opt..."
+    cd /opt || exit 1
+    sudo tar xjf /tmp/Android.tar.bz2
+    rm /tmp/Android.tar.bz2
+
+    echo "Criando link simbólico em /etc/skel..."
+    cd /etc/skel || exit 1
+    sudo unlink Android 2>/dev/null
+    sudo ln -s /opt/Android Android
+  fi
+
+  # Instala o Android Studio via Snap
+  if ! snap list | grep -q android-studio; then
+    echo "Instalando Android Studio via Snap..."
+    sudo snap install android-studio --classic
+  else
+    echo "Android Studio já está instalado via Snap."
+  fi
+
+  # Instala o Gradle
+  if [[ ! -d /opt/gradle ]]; then
+    echo "Baixando Gradle..."
+    wget https://nuvem.ufba.br/s/U5anBL3tRpN2xhT/download --no-check-certificate -O /tmp/gradle.tar.bz2
+
+    echo "Extraindo Gradle em /opt..."
+    cd /opt || exit 1
+    sudo tar xjf /tmp/gradle.tar.bz2
+    sudo mv .gradle gradle
+    sudo chown -R aluno:aluno gradle
+    rm /tmp/gradle.tar.bz2
+  fi
+
+  # Marca que o Android Studio foi instalado
+  sudo touch /usr/local/sbin/android.sh
+
+  echo "Android Studio instalado com sucesso."
+else
+  echo "Android Studio já está instalado (/usr/local/sbin/android.sh encontrado)."
 fi
 
-if [[ ! -d /opt/gradle ]]; then
-  wget https://nuvem.ufba.br/s/U5anBL3tRpN2xhT/download --no-check-certificate -O /tmp/gradle.tar.bz2
-  cd /opt
-  tar xjf /tmp/gradle.tar.bz2
-  mv .gradle gradle
-  chown -R aluno:aluno gradle
-  rm /tmp/gradle.tar.bz2
-fi
 
-if [ -f /etc/init.d/aluno.sh ]; then
-  rm /etc/init.d/aluno.sh
-  echo "aluno.sh removido"
-fi
+
+#if [[ ! -d /opt/Android ]]; then
+#  wget https://nuvem.ufba.br/s/FjNaDukULOwHhs4/download --no-check-certificate -O /tmp/Android.tar.bz2
+#  cd /opt
+#  tar xjf /tmp/Android.tar.bz2
+#  rm /tmp/Android.tar.bz2
+#  cd /etc/skel
+#  unlink Android
+#  ln -s /opt/Android .
+#fi
+#if [[ ! -d /opt/android-studio ]]; then
+#  wget https://nuvem.ufba.br/s/6BUVDGWKKMxR6Fj/download --no-check-certificate -O /tmp/android-studio.tar.bz2
+#  cd /opt
+#  tar xjf /tmp/android-studio.tar.bz2
+#  rm /tmp/android-studio.tar.bz2
+#fi
+
+#if [[ ! -d /opt/gradle ]]; then
+#  wget https://nuvem.ufba.br/s/U5anBL3tRpN2xhT/download --no-check-certificate -O /tmp/gradle.tar.bz2
+#  cd /opt
+#  tar xjf /tmp/gradle.tar.bz2
+#  mv .gradle gradle
+#  chown -R aluno:aluno gradle
+#  rm /tmp/gradle.tar.bz2
+#fi
+
+#if [ -f /etc/init.d/aluno.sh ]; then
+#  rm /etc/init.d/aluno.sh
+#  echo "aluno.sh removido"
+#fi
 
 #unityhub
 sudo add-apt-repository -y ppa:dotnet/backports
