@@ -18,31 +18,31 @@ if ! [ -f /usr/local/sbin/done.txt ]; then
  	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
 	chmod 755 /usr/local/sbin/done.txt
 else
-	if ! cmp -s /usr/local/sbin/lab-profile-config.sh /tmp/lab-profile-config.sh; then
+	if [ ! -f /usr/local/sbin/lab-profile-config.sh ] || ! cmp -s /usr/local/sbin/lab-profile-config.sh /tmp/lab-profile-config.sh; then
  	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
 	#sudo echo "false" > /usr/local/sbin/done.txt
 	fi
-	if ! cmp -s /usr/local/sbin/lab-aluno-config.sh /tmp/lab-aluno-config.sh; then
+	if [ ! -f /usr/local/sbin/lab-aluno-config.sh ] || ! cmp -s /usr/local/sbin/lab-aluno-config.sh /tmp/lab-aluno-config.sh; then
 	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
  	#sudo echo "false" > /usr/local/sbin/done.txt
 	fi
-	if ! cmp -s /usr/local/sbin/lab-programs.sh /tmp/lab-programs.sh; then
+	if [ ! -f /usr/local/sbin/lab-programs.sh ] || ! cmp -s /usr/local/sbin/lab-programs.sh /tmp/lab-programs.sh; then
 	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
  	#sudo echo "false" > /usr/local/sbin/done.txt
 	fi
-	if ! cmp -s /usr/local/sbin/lab-eula-programs.sh /tmp/lab-eula-programs.sh; then
+	if [ ! -f /usr/local/sbin/lab-eula-programs.sh ] || ! cmp -s /usr/local/sbin/lab-eula-programs.sh /tmp/lab-eula-programs.sh; then
 	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
  	#sudo echo "false" > /usr/local/sbin/done.txt
 	fi
- 	if ! cmp -s /usr/local/sbin/lab-program-config.sh /tmp/lab-program-config.sh; then
+	if [ ! -f /usr/local/sbin/lab-program-config.sh ] || ! cmp -s /usr/local/sbin/lab-program-config.sh /tmp/lab-program-config.sh; then
 	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
  	#sudo echo "false" > /usr/local/sbin/done.txt
 	fi
-  	if ! cmp -s /usr/local/sbin/lab-inventory.sh /tmp/lab-inventory.sh; then
+	if [ ! -f /usr/local/sbin/lab-inventory.sh ] || ! cmp -s /usr/local/sbin/lab-inventory.sh /tmp/lab-inventory.sh; then
 	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
  	#sudo echo "false" > /usr/local/sbin/done.txt
 	fi
- 	if ! cmp -s /usr/local/sbin/lab-admin-profile-config.sh /tmp/lab-admin-profile-config.sh; then
+	if [ ! -f /usr/local/sbin/lab-admin-profile-config.sh ] || ! cmp -s /usr/local/sbin/lab-admin-profile-config.sh /tmp/lab-admin-profile-config.sh; then
 	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
  	#sudo echo "false" > /usr/local/sbin/done.txt
 	fi
@@ -78,7 +78,7 @@ if [ "$DONE" = "false" ]; then
 	rm -f /tmp/lab-admin-profile-config.sh
 
 	echo "SCRIPTS ATUALIZADOS"
- 	sudo echo "true" > /usr/local/sbin/done.txt
+ 	echo "true" | sudo tee /usr/local/sbin/done.txt > /dev/null
 else
 	echo "SEM NECESSIDADE DE ATUALIZAR SCRIPTS"
 fi
