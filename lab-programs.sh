@@ -2,6 +2,16 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+echo "Configurando sistema antes da instalação dos pacotes..."
+
+sudo dpkg --configure -a
+sudo apt-get update -y
+sudo apt-get upgrade -y
+sudo apt-get dist-upgrade -y
+sudo apt-get install -f -y
+
+echo "Sistema atualizado com sucesso."
+
 # Sublime Text
 #wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
 #echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
