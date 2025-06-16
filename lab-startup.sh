@@ -14,29 +14,37 @@ wget https://raw.githubusercontent.com/graco-ufba/lab-scripts/main/lab-admin-pro
 
 if ! [ -f /usr/local/sbin/done.txt ]; then
 	sudo touch /usr/local/sbin/done.txt
-	sudo echo "false" > /usr/local/sbin/done.txt
+	#sudo echo "false" > /usr/local/sbin/done.txt
+ 	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
 	chmod 755 /usr/local/sbin/done.txt
 else
 	if ! cmp -s /usr/local/sbin/lab-profile-config.sh /tmp/lab-profile-config.sh; then
-	sudo echo "false" > /usr/local/sbin/done.txt
+ 	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
+	#sudo echo "false" > /usr/local/sbin/done.txt
 	fi
 	if ! cmp -s /usr/local/sbin/lab-aluno-config.sh /tmp/lab-aluno-config.sh; then
-	sudo echo "false" > /usr/local/sbin/done.txt
+	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
+ 	#sudo echo "false" > /usr/local/sbin/done.txt
 	fi
 	if ! cmp -s /usr/local/sbin/lab-programs.sh /tmp/lab-programs.sh; then
-	sudo echo "false" > /usr/local/sbin/done.txt
+	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
+ 	#sudo echo "false" > /usr/local/sbin/done.txt
 	fi
 	if ! cmp -s /usr/local/sbin/lab-eula-programs.sh /tmp/lab-eula-programs.sh; then
-	sudo echo "false" > /usr/local/sbin/done.txt
+	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
+ 	#sudo echo "false" > /usr/local/sbin/done.txt
 	fi
  	if ! cmp -s /usr/local/sbin/lab-program-config.sh /tmp/lab-program-config.sh; then
-	sudo echo "false" > /usr/local/sbin/done.txt
+	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
+ 	#sudo echo "false" > /usr/local/sbin/done.txt
 	fi
   	if ! cmp -s /usr/local/sbin/lab-inventory.sh /tmp/lab-inventory.sh; then
-	sudo echo "false" > /usr/local/sbin/done.txt
+	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
+ 	#sudo echo "false" > /usr/local/sbin/done.txt
 	fi
  	if ! cmp -s /usr/local/sbin/lab-admin-profile-config.sh /tmp/lab-admin-profile-config.sh; then
-	sudo echo "false" > /usr/local/sbin/done.txt
+	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
+ 	#sudo echo "false" > /usr/local/sbin/done.txt
 	fi
 fi
 
