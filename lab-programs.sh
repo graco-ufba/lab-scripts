@@ -1,346 +1,245 @@
 #!/bin/bash
 
+# Configuração inicial
 export DEBIAN_FRONTEND=noninteractive
+sudo -E apt-get update -y
+sudo -E apt-get install -y software-properties-common apt-transport-https ca-certificates curl wget gnupg
 
-echo "Configurando sistema antes da instalação dos pacotes..."
-
-sudo dpkg --configure -a
-sudo apt-get update -y
-sudo apt-get upgrade -y
-sudo apt-get dist-upgrade -y
-sudo apt-get install -f -y
-
-echo "Sistema atualizado com sucesso."
-
-# Sublime Text
-#wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
-#echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
-instalar_sublime() {
-    echo "Adicionando repositório do Sublime Text..."
-
-    # Baixar e adicionar a chave GPG de forma segura
-    curl -fsSL https://download.sublimetext.com/sublimehq-pub.gpg | sudo gpg --dearmor -o /usr/share/keyrings/sublime-text-archive-keyring.gpg
-
-    # Adicionar o repositório do Sublime Text à lista de fontes do APT
-    echo "deb [signed-by=/usr/share/keyrings/sublime-text-archive-keyring.gpg] https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
-
-    # Atualizar e instalar o Sublime Text
-    echo "Atualizando pacotes e instalando o Sublime Text..."
-    sudo apt update -y
-    sudo apt install sublime-text -y
-
-    # Verificação de instalação
-    if command -v subl &>/dev/null; then
-        echo "Sublime Text instalado com sucesso!"
+# Função para verificar instalação
+check_install() {
+    if command -v $1 &>/dev/null; then
+        echo "[SUCESSO] $1 instalado corretamente"
+        return 0
     else
-        echo "Falha ao instalar o Sublime Text."
+        echo "[ERRO] Falha ao instalar $1"
+        return 1
     fi
 }
 
+# Atualização do sistema
+echo "Atualizando sistema..."
+sudo -E apt-get update -y
+sudo -E apt-get upgrade -y
+sudo -E apt-get dist-upgrade -y
+sudo -E apt-get autoremove -y
+sudo -E apt-get install -f -y
 
-#neofetch
-sudo apt install neofetch -y
+# Instalar Sublime Text
+echo "Instalando Sublime Text..."
+curl -fsSL https://download.sublimetext.com/sublimehq-pub.gpg | sudo gpg --dearmor -o /usr/share/keyrings/sublime-text-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/sublime-text-archive-keyring.gpg] https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+sudo -E apt-get update -y
+sudo -E apt-get install -y sublime-text
+check_install subl
 
-# Visual Studio Code
+# Instalar Neofetch
+echo "Instalando Neofetch..."
+sudo -E apt-get install -y neofetch
+check_install neofetch
+
+# Instalar Visual Studio Code
+echo "Instalando Visual Studio Code..."
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
 sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
 sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
 rm -f packages.microsoft.gpg
+sudo -E apt-get update -y
+sudo -E apt-get install -y code
+check_install code
 
-# OBS Studio
+# Instalar OBS Studio
+echo "Instalando OBS Studio..."
 sudo add-apt-repository -y ppa:obsproject/obs-studio
+sudo -E apt-get update -y
+sudo -E apt-get install -y obs-studio v4l2loopback-dkms
+check_install obs
 
-### Apt-get
-DEBIAN_FRONTEND=noninteractive dpkg --configure -a
-apt-get update -y
-apt-get install -y  \
-  python3-pip default-jre default-jdk maven swi-prolog racket elixir clisp nasm gcc-multilib \
-  python3.11-full \
-  git \
-  flex bison \
-  sublime-text code vim sasm \
-  obs-studio v4l2loopback-dkms \
-  mysql-server postgresql postgresql-contrib \
-  arp-scan net-tools mtr dnsutils traceroute curl \
-  gnupg ca-certificates \
-  podman
+# Instalar pacotes essenciais
+echo "Instalando pacotes essenciais..."
+sudo -E apt-get install -y \
+    python3-pip default-jre default-jdk maven swi-prolog racket elixir clisp nasm gcc-multilib \
+    python3.11-full python3.10-venv \
+    git flex bison vim sasm \
+    mysql-server postgresql postgresql-contrib \
+    arp-scan net-tools mtr dnsutils traceroute curl \
+    gnupg ca-certificates podman megatools
 
-# PostgreSQL 17
-sudo apt-get update
+# Configurar PostgreSQL 17
+echo "Instalando PostgreSQL 17..."
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-sudo apt-get update
-sudo apt-get install -y postgresql-17 postgresql-contrib
+sudo -E apt-get update -y
+sudo -E apt-get install -y postgresql-17 postgresql-contrib
 sudo systemctl start postgresql
 sudo systemctl enable postgresql
+check_install psql
 
-# PGAdmin
-sudo apt install curl -y
+# Instalar pgAdmin
+echo "Instalando pgAdmin..."
 curl -fsS https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo gpg --dearmor -o /usr/share/keyrings/packages-pgadmin-org.gpg
-sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/packages-pgadmin-org.gpg] https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list && apt update'
-sudo apt install -y pgadmin4-web
-sudo apt install -y pgadmin4-desktop
+sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/packages-pgadmin-org.gpg] https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list'
+sudo -E apt-get update -y
+sudo -E apt-get install -y pgadmin4-web pgadmin4-desktop
 
-#mysql workbench
-wget http://cdn.mysql.com/Downloads/MySQLGUITools/mysql-workbench-community_8.0.34-1ubuntu22.04_amd64.deb -O mysql-workbench-community.deb
-sudo dpkg -i mysql-workbench-community.deb
-sudo apt-get -f install -y
-sudo rm mysql-workbench-community.deb
+# Instalar MySQL Workbench
+echo "Instalando MySQL Workbench..."
+wget http://cdn.mysql.com/Downloads/MySQLGUITools/mysql-workbench-community_8.0.34-1ubuntu22.04_amd64.deb -O /tmp/mysql-workbench.deb
+sudo -E dpkg -i /tmp/mysql-workbench.deb || sudo -E apt-get -f install -y
+rm /tmp/mysql-workbench.deb
+check_install mysql-workbench
 
-#netbeans
-sudo apt update
-sudo apt install snapd
-sudo apt install -y openjdk-17-jdk
+# Instalar NetBeans via Snap
+echo "Instalando NetBeans..."
+sudo -E apt-get install -y openjdk-17-jdk
 sudo snap install netbeans --classic
+check_install netbeans
 
-
-#Megatools
-sudo apt install megatools -y
-
-#SimulIDE
-#megadl "https://mega.nz/file/8akRDCYJ#8Fvn6U9RIJ-sX_f49fCsn05YTUr5ySNycoFlxVFX-iE"
-#tar -xzvf SimulIDE_1.1.0-SR1_Lin64.tar.gz && rm SimulIDE_1.1.0-SR1_Lin64.tar.gz
-#sudo apt update
-#sudo apt install fuse libfuse2 -y
-#sudo apt install libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libqt5svg5 qtbase5-dev qttools5-dev-tools libqt5serialport5 libqt5serialport5-dev -y
-
-# Instalação do SimulIDE
-echo "Baixando e instalando SimulIDE..."
-sudo apt install megatools -y
-megadl "https://mega.nz/file/8akRDCYJ#8Fvn6U9RIJ-sX_f49fCsn05YTUr5ySNycoFlxVFX-iE"
-tar -xzvf SimulIDE_1.1.0-SR1_Lin64.tar.gz && rm SimulIDE_1.1.0-SR1_Lin64.tar.gz
-sudo apt update
-sudo apt install fuse libfuse2 -y
-sudo apt install libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libqt5svg5 qtbase5-dev qttools5-dev-tools libqt5serialport5 libqt5serialport5-dev -y
-
-# Configurar permissão de execução e criar atalho
-chmod +x SimulIDE_1.1.0-SR1_Lin64/simulide
-ln -sf "$PWD/SimulIDE_1.1.0-SR1_Lin64/simulide" /usr/local/bin/simulide
-
-
-
-#Atmel AVRA
-#sudo apt-get install avrdude avra -y
-#cd $HOME
-#git clone https://github.com/lpodkalicki/blog.git
-#cd $HOME/blog/avr/attiny13/043_blinky_with_delay_function_asm
-#make
-#cd $HOME/blog/avr/attiny13/043_blinky_with_delay_function_asm
-#make flash
-#sudo wget https://raw.githubusercontent.com/DarkSector/AVR/master/asm/include/m16def.inc -y
-
-#Atmel AVRA
-sudo apt-get update -y
-sudo apt-get install avrdude avra -y
-cd $HOME
-wget https://sourceforge.net/projects/avra/files/1.3.0/avra_1.3.0_linux.tar.gz
-tar -xvzf avra_1.3.0_linux.tar.gz
-cd avra_1.3.0
-sudo cp avra /usr/local/bin/
-cd $HOME
-git clone https://github.com/lpodkalicki/blog.git
-cd $HOME/blog/avr/attiny13/043_blinky_with_delay_function_asm
-make
-make flash
-sudo wget https://raw.githubusercontent.com/DarkSector/AVR/master/asm/include/m16def.inc -O /usr/local/include/m16def.inc
-
-
-#Arduino IDE
-sudo snap install arduino
-sudo usermod -a -G dialout aluno
-
-#wine
-sudo apt install wine64 -y
-
-#mongodb
-if ! [ -f /etc/mongod.conf ]; then
-  sudo apt-get install gnupg curl -y
-  curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | \
-    sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg \
-    --dearmor
-  echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
-  sudo apt-get update -y
-  sudo apt-get install -y mongodb-org -y
+# Instalar SimulIDE
+echo "Instalando SimulIDE..."
+sudo -E apt-get install -y fuse libfuse2 libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libqt5svg5 qtbase5-dev qttools5-dev-tools libqt5serialport5 libqt5serialport5-dev
+if [ ! -f /usr/local/bin/simulide ]; then
+    megadl "https://mega.nz/file/8akRDCYJ#8Fvn6U9RIJ-sX_f49fCsn05YTUr5ySNycoFlxVFX-iE" -o /tmp/SimulIDE.tar.gz
+    tar -xzvf /tmp/SimulIDE.tar.gz -C /opt
+    chmod +x /opt/SimulIDE_1.1.0-SR1_Lin64/simulide
+    ln -sf /opt/SimulIDE_1.1.0-SR1_Lin64/simulide /usr/local/bin/simulide
+    rm /tmp/SimulIDE.tar.gz
 fi
+check_install simulide
 
-#R
-if [[ -f /usr/lib/R/site-library/done.txt || -f /usr/local/lib/R/site-library/done.txt ]]; then
-echo "R já instalado"
-else
-sudo dpkg -r rstudio -y
-sudo apt remove r-base -y
-sudo apt update -qqy
-sudo apt autoremove -y
-sudo apt install --no-install-recommends software-properties-common dirmngr -y
+# Instalar Arduino IDE
+echo "Instalando Arduino IDE..."
+sudo snap install arduino
+sudo usermod -a -G dialout $USER
+check_install arduino
+
+# Instalar Wine
+echo "Instalando Wine..."
+sudo -E apt-get install -y wine64
+check_install wine
+
+# Instalar MongoDB
+echo "Instalando MongoDB..."
+if ! [ -f /etc/mongod.conf ]; then
+    curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+    sudo -E apt-get update -y
+    sudo -E apt-get install -y mongodb-org
+    sudo systemctl start mongod
+    sudo systemctl enable mongod
+fi
+check_install mongo
+
+# Instalar R e RStudio
+echo "Instalando R e RStudio..."
+sudo -E apt-get install -y --no-install-recommends software-properties-common dirmngr
 wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | sudo tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
 sudo add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
-sudo apt install --no-install-recommends r-base -y
-sudo apt install --no-install-recommends r-base-dev -y
-sudo apt -y install gdebi-core-
-wget https://download1.rstudio.org/electron/jammy/amd64/rstudio-2024.04.2-764-amd64.deb -O /tmp/rstudio.deb && sudo gdebi -n /tmp/rstudio.deb
-fi
+sudo -E apt-get update -y
+sudo -E apt-get install -y --no-install-recommends r-base r-base-dev
+wget https://download1.rstudio.org/electron/jammy/amd64/rstudio-2024.04.2-764-amd64.deb -O /tmp/rstudio.deb
+sudo -E gdebi -n /tmp/rstudio.deb
+rm /tmp/rstudio.deb
+check_install R
+check_install rstudio
 
-
-if ! [ -f /usr/bin/rstudio ]; then
-sudo apt -y install gdebi-core-
-wget https://download1.rstudio.org/electron/jammy/amd64/rstudio-2024.04.2-764-amd64.deb -O /tmp/rstudio.deb && sudo gdebi -n /tmp/rstudio.deb
-fi
-
-# Node
+# Instalar Node.js
+echo "Instalando Node.js..."
 mkdir -p /etc/apt/keyrings
-curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/nodesource.gpg
-NODE_MAJOR=20
-echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
-apt-get update
-apt-get install nodejs -y
-
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+sudo -E apt-get update -y
+sudo -E apt-get install -y nodejs
 mkdir -p /opt/npm
-chown -R aluno:aluno /opt/npm
-rm -f /etc/skel/.npm
-ln -s /opt/npm /etc/skel/.npm
-
-# Pacotes Node
+chown -R $USER:$USER /opt/npm
 npm install -g @angular/cli
+check_install node
 
-# Python
-update-alternatives --install /usr/bin/python3 python3  /usr/bin/python3.11 1
-update-alternatives --install /usr/bin/python3 python3  /usr/bin/python3.10 2
-sudo apt install -y python3.10-venv
+# Configurar Python
+echo "Configurando Python..."
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2
+sudo -E apt-get install -y python3.10-venv python3.11-venv
 
-### Snaps
+# Instalar snaps
+echo "Instalando snaps..."
 sudo snap install eclipse --classic
 sudo snap install intellij-idea-community --classic
 sudo snap install mongo33
 sudo snap install bluej
 
-# Flutter
-# sudo snap install flutter --classic
-snap remove flutter
+# Instalar Flutter
+echo "Instalando Flutter..."
 if [ ! -d "/opt/flutter" ]; then
-  cd /opt
-  wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.10.5-stable.tar.xz -O /tmp/flutter.tar.xz
-  tar xf /tmp/flutter.tar.xz
-  chown -R aluno:aluno flutter
-  cd -
+    wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.10.5-stable.tar.xz -O /tmp/flutter.tar.xz
+    tar xf /tmp/flutter.tar.xz -C /opt
+    chown -R $USER:$USER /opt/flutter
+    rm /tmp/flutter.tar.xz
+    echo 'export PATH="$PATH:/opt/flutter/bin"' >> ~/.bashrc
 fi
+check_install flutter
 
-#Nand2Tetris
+# Instalar Nand2Tetris
+echo "Instalando Nand2Tetris..."
 if [ ! -d "/opt/nand2tetris" ]; then
-sudo apt-get install unzip
-wget --no-check-certificate https://nuvem.ufba.br/s/ykUB6F81M5z2Ef1/download -O /opt/nand2tetris.zip
-cd /opt
-unzip nand2tetris.zip
-rm nand2tetris.zip
+    wget --no-check-certificate https://nuvem.ufba.br/s/ykUB6F81M5z2Ef1/download -O /tmp/nand2tetris.zip
+    unzip /tmp/nand2tetris.zip -d /opt
+    rm /tmp/nand2tetris.zip
 fi
 
-# Google Chrome
-if ! command -v google-chrome &> /dev/null; then
-	cd /tmp
-	wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-	dpkg -i google-chrome-stable_current_amd64.deb
-	cd -
+# Instalar Google Chrome
+echo "Instalando Google Chrome..."
+if ! command -v google-chrome &>/dev/null; then
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/chrome.deb
+    sudo -E dpkg -i /tmp/chrome.deb || sudo -E apt-get -f install -y
+    rm /tmp/chrome.deb
 fi
+check_install google-chrome
 
-##################################
-
-# Instala o Android SDK e Android Studio
-
-#!/bin/bash
-
-# Instalação do Android SDK, Android Studio (via Snap) e Gradle
+# Instalar Android Studio e SDK
+echo "Instalando Android Studio..."
 if ! [ -f /usr/local/sbin/android.sh ]; then
-  echo "Instalando Android SDK, Android Studio e Gradle..."
+    # Android SDK
+    if [[ ! -d /opt/Android ]]; then
+        wget https://nuvem.ufba.br/s/FjNaDukULOwHhs4/download -O /tmp/Android.tar.bz2
+        tar xjf /tmp/Android.tar.bz2 -C /opt
+        rm /tmp/Android.tar.bz2
+        ln -sf /opt/Android $HOME/Android
+    fi
 
-  # Instala o Android SDK
-  if [[ ! -d /opt/Android ]]; then
-    echo "Baixando Android SDK..."
-    wget https://nuvem.ufba.br/s/FjNaDukULOwHhs4/download --no-check-certificate -O /tmp/Android.tar.bz2
+    # Android Studio via Snap
+    if ! snap list | grep -q android-studio; then
+        sudo snap install android-studio --classic
+    fi
 
-    echo "Extraindo Android SDK em /opt..."
-    cd /opt || exit 1
-    sudo tar xjf /tmp/Android.tar.bz2
-    rm /tmp/Android.tar.bz2
+    # Gradle
+    if [[ ! -d /opt/gradle ]]; then
+        wget https://nuvem.ufba.br/s/U5anBL3tRpN2xhT/download -O /tmp/gradle.tar.bz2
+        tar xjf /tmp/gradle.tar.bz2 -C /opt
+        mv /opt/.gradle /opt/gradle
+        chown -R $USER:$USER /opt/gradle
+        rm /tmp/gradle.tar.bz2
+    fi
 
-    echo "Criando link simbólico em /etc/skel..."
-    cd /etc/skel || exit 1
-    sudo unlink Android 2>/dev/null
-    sudo ln -s /opt/Android Android
-  fi
-
-  # Instala o Android Studio via Snap
-  if ! snap list | grep -q android-studio; then
-    echo "Instalando Android Studio via Snap..."
-    sudo snap install android-studio --classic
-  else
-    echo "Android Studio já está instalado via Snap."
-  fi
-
-  # Instala o Gradle
-  if [[ ! -d /opt/gradle ]]; then
-    echo "Baixando Gradle..."
-    wget https://nuvem.ufba.br/s/U5anBL3tRpN2xhT/download --no-check-certificate -O /tmp/gradle.tar.bz2
-
-    echo "Extraindo Gradle em /opt..."
-    cd /opt || exit 1
-    sudo tar xjf /tmp/gradle.tar.bz2
-    sudo mv .gradle gradle
-    sudo chown -R aluno:aluno gradle
-    rm /tmp/gradle.tar.bz2
-  fi
-
-  # Marca que o Android Studio foi instalado
-  sudo touch /usr/local/sbin/android.sh
-
-  echo "Android Studio instalado com sucesso."
-else
-  echo "Android Studio já está instalado (/usr/local/sbin/android.sh encontrado)."
+    sudo touch /usr/local/sbin/android.sh
 fi
+check_install android-studio
 
-
-
-#if [[ ! -d /opt/Android ]]; then
-#  wget https://nuvem.ufba.br/s/FjNaDukULOwHhs4/download --no-check-certificate -O /tmp/Android.tar.bz2
-#  cd /opt
-#  tar xjf /tmp/Android.tar.bz2
-#  rm /tmp/Android.tar.bz2
-#  cd /etc/skel
-#  unlink Android
-#  ln -s /opt/Android .
-#fi
-#if [[ ! -d /opt/android-studio ]]; then
-#  wget https://nuvem.ufba.br/s/6BUVDGWKKMxR6Fj/download --no-check-certificate -O /tmp/android-studio.tar.bz2
-#  cd /opt
-#  tar xjf /tmp/android-studio.tar.bz2
-#  rm /tmp/android-studio.tar.bz2
-#fi
-
-#if [[ ! -d /opt/gradle ]]; then
-#  wget https://nuvem.ufba.br/s/U5anBL3tRpN2xhT/download --no-check-certificate -O /tmp/gradle.tar.bz2
-#  cd /opt
-#  tar xjf /tmp/gradle.tar.bz2
-#  mv .gradle gradle
-#  chown -R aluno:aluno gradle
-#  rm /tmp/gradle.tar.bz2
-#fi
-
-#if [ -f /etc/init.d/aluno.sh ]; then
-#  rm /etc/init.d/aluno.sh
-#  echo "aluno.sh removido"
-#fi
-
-#unityhub
+# Instalar Unity Hub
+echo "Instalando Unity Hub..."
 sudo add-apt-repository -y ppa:dotnet/backports
 wget -qO - https://hub.unity3d.com/linux/keys/public | gpg --dearmor | sudo tee /usr/share/keyrings/Unity_Technologies_ApS.gpg > /dev/null
 sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/Unity_Technologies_ApS.gpg] https://hub.unity3d.com/linux/repos/deb stable main" > /etc/apt/sources.list.d/unityhub.list'
-sudo apt update -y
-sudo apt-get install -y unityhub dotnet-sdk-9.0
+sudo -E apt-get update -y
+sudo -E apt-get install -y unityhub dotnet-sdk-9.0
+check_install unityhub
 
-# Frame0
+# Instalar Frame0
+echo "Instalando Frame0..."
 if ! dpkg -l | grep -q frame0; then
-  wget https://files.frame0.app/releases/linux/x64/frame0_1.0.0~beta.8_amd64.deb -O /tmp/frame0.deb
-  sudo dpkg -i /tmp/frame0.deb
-  sudo apt-get -f install -y
-  rm /tmp/frame0.deb
+    wget https://files.frame0.app/releases/linux/x64/frame0_1.0.0~beta.8_amd64.deb -O /tmp/frame0.deb
+    sudo -E dpkg -i /tmp/frame0.deb || sudo -E apt-get -f install -y
+    rm /tmp/frame0.deb
 fi
+check_install frame0
 
-exit 0
+echo "Instalação concluída!"
