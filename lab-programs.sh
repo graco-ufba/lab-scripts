@@ -24,6 +24,14 @@ sudo -E apt-get dist-upgrade -y
 sudo -E apt-get autoremove -y
 sudo -E apt-get install -f -y
 
+# Instalar ClamAV (antivirus) e ClamTK (interface gráfica)
+echo "Instalando ClamAV e ClamTK..."
+sudo -E apt-get update -y
+sudo -E apt-get install -y clamav freshclam clamtk
+sudo freshclam  # Atualiza as definições de vírus
+check_install clamscan
+check_install clamtk
+
 # Instalar Sublime Text
 echo "Instalando Sublime Text..."
 curl -fsSL https://download.sublimetext.com/sublimehq-pub.gpg | sudo gpg --dearmor -o /usr/share/keyrings/sublime-text-archive-keyring.gpg
