@@ -2,8 +2,16 @@
 
 # Configuração inicial
 export DEBIAN_FRONTEND=noninteractive
+
+# Desabilitar popups de atualização de versão do Ubuntu
+echo "Desabilitando notificações de atualização de versão do Ubuntu..."
+sudo sed -i 's/^Prompt=.*/Prompt=never/' /etc/update-manager/release-upgrades
+gsettings set com.ubuntu.update-notifier show-livepatch-status false 2>/dev/null || true
+gsettings set com.ubuntu.update-notifier auto-launch false 2>/dev/null || true
+sudo systemctl disable --now apt-daily.service apt-daily.timer apt-daily-upgrade.timer apt-daily-upgrade.service
 sudo -E apt-get update -y
 sudo -E apt-get install -y software-properties-common apt-transport-https ca-certificates curl wget gnupg
+
 
 # Função para verificar instalação
 check_install() {
