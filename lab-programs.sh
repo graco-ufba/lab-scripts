@@ -80,6 +80,11 @@ sudo -E apt-get install -y \
     arp-scan net-tools mtr dnsutils traceroute curl \
     gnupg ca-certificates podman megatools
 
+    # Instalar GNU Octave
+    echo "Instalando GNU Octave..."
+    sudo -E apt-get install -y octave
+    check_install octave
+
     # Atualizar Racket se necessário (versão oficial do site)
 echo "Verificando Racket..."
 
