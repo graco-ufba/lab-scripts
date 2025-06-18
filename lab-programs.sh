@@ -80,6 +80,30 @@ sudo -E apt-get install -y \
     arp-scan net-tools mtr dnsutils traceroute curl \
     gnupg ca-certificates podman megatools
 
+    # Atualizar Racket se necessário (versão oficial do site)
+echo "Verificando Racket..."
+
+LATEST_RACKET_URL=$(curl -s https://download.racket-lang.org/ | grep -oP 'https://[^"]+linux-x64.sh' | head -n 1)
+
+if [ ! -z "$LATEST_RACKET_URL" ]; then
+    echo "Baixando e instalando a versão mais recente do Racket..."
+    wget -O /tmp/racket-install.sh "$LATEST_RACKET_URL"
+    chmod +x /tmp/racket-install.sh
+    sudo /tmp/racket-install.sh --in-place --dest /opt/racket
+    sudo ln -sf /opt/racket/bin/racket /usr/local/bin/racket
+    rm /tmp/racket-install.sh
+fi
+
+check_install racket
+
+# Verificar e atualizar SWI-Prolog a partir do repositório oficial
+echo "Verificando SWI-Prolog..."
+sudo add-apt-repository -y ppa:swi-prolog/stable
+sudo -E apt-get update -y
+sudo -E apt-get install -y swi-prolog
+check_install swipl
+
+
 # Configurar PostgreSQL 17
 echo "Instalando PostgreSQL 17..."
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
