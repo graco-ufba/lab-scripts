@@ -59,5 +59,6 @@ echo '' > /etc/gdm3/PostSession/Default
 # Backup dos scripts originais, se existirem
 [[ -f /etc/gdm3/PostLogin/Default.bak ]] || sudo mv /etc/gdm3/PostLogin/Default /etc/gdm3/PostLogin/Default.bak
 [[ -f /etc/gdm3/PostSession/Default.bak ]] || sudo mv /etc/gdm3/PostSession/Default /etc/gdm3/PostSession/Default.bak || true
+sudo systemctl restart gdm3
 
 exit 0
