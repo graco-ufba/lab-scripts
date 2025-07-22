@@ -40,6 +40,7 @@ sudo freshclam  # Atualiza as definições de vírus
 check_install clamscan
 check_install clamtk
 
+
 # Instalar Docker
 echo "Instalando Docker..."
 sudo -E apt-get install -y ca-certificates curl gnupg lsb-release
@@ -58,6 +59,7 @@ check_install docker
 echo "Instalando Ollama..."
 curl -fsSL https://ollama.com/install.sh | sh
 check_install ollama
+
 
 # Instalar Sublime Text
 echo "Instalando Sublime Text..."
