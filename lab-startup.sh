@@ -78,7 +78,7 @@ if [ "$DONE" = "false" ]; then
 	rm -f /tmp/lab-admin-profile-config.sh
 
 	echo "SCRIPTS ATUALIZADOS"
- 	echo "false" | sudo tee /usr/local/sbin/done.txt > /dev/null
+ 	echo "true" | sudo tee /usr/local/sbin/done.txt > /dev/null
 else
 	echo "SEM NECESSIDADE DE ATUALIZAR SCRIPTS"
 fi
