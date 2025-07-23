@@ -43,17 +43,26 @@ check_install clamtk
 
 # Instalar Docker
 echo "Instalando Docker..."
-sudo -E apt-get install -y ca-certificates curl gnupg lsb-release
-sudo install -m 0755 -d /etc/apt/keyrings
+# Instalar dependências necessárias
+sudo apt-get install -y ca-certificates curl gnupg lsb-release
+# Criar diretório para chave GPG do Docker (com permissão adequada)
+sudo mkdir -p /etc/apt/keyrings
+# Baixar e adicionar a chave GPG do Docker
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | \
+# Adicionar o repositório oficial do Docker
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo -E apt-get update -y
-sudo -E apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo usermod -aG docker $USER
+# Atualizar a lista de pacotes
+sudo apt-get update -y
+# Instalar os pacotes Docker
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+# Adicionar o usuário correto ao grupo docker para permitir usar docker sem sudo
+USERNAME=${SUDO_USER:-$USER}
+sudo usermod -aG docker $USERNAME
+echo "Docker instalado e usuário $USERNAME adicionado ao grupo docker. Faça logout/login para aplicar as permissões."
+# Verificar instalação
 check_install docker
+
 
 # Instalar Ollama
 echo "Instalando Ollama..."
