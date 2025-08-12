@@ -40,6 +40,10 @@ sudo freshclam  # Atualiza as definições de vírus
 check_install clamscan
 check_install clamtk
 
+# Instalar Jupyter
+echo "Instalando Jupyter..."
+pip install jupyter -q
+check_install jupyter
 
 # Instalar Docker
 echo "Instalando Docker..."
