@@ -3,6 +3,14 @@
 # Configuração inicial
 export DEBIAN_FRONTEND=noninteractive
 
+# Corrigir erro "check-new-release-gtk crashed with apt_pkg"
+echo "Corrigindo possíveis problemas no release upgrader..."
+sudo apt-get update -y
+sudo apt-get install --reinstall -y ubuntu-release-upgrader-core ubuntu-release-upgrader-gtk python3-apt
+sudo apt --fix-broken install -y
+sudo dpkg --configure -a
+sudo apt autoremove -y
+
 # Desabilitar popups de atualização de versão do Ubuntu
 echo "Desabilitando notificações de atualização de versão do Ubuntu..."
 sudo sed -i 's/^Prompt=.*/Prompt=never/' /etc/update-manager/release-upgrades
