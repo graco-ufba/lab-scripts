@@ -76,10 +76,10 @@ echo "Docker instalado e usuário $USERNAME adicionado ao grupo docker. Faça lo
 check_install docker
 
 # Instalar AVRA (Assembler para AVR)
-echo "Instalando AVRA..."
-sudo -E apt-get update -y
-sudo -E apt-get install -y avra
-check_install avra
+#echo "Instalando AVRA..."
+#sudo -E apt-get update -y
+#sudo -E apt-get install -y avra
+#check_install avra
 
 # --- Instalar a versão 1.3.0 do SourceForge ---
 echo "Instalando AVRA 1.3.0 (SourceForge)..."
