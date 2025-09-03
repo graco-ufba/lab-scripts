@@ -75,6 +75,22 @@ echo "Docker instalado e usuário $USERNAME adicionado ao grupo docker. Faça lo
 # Verificar instalação
 check_install docker
 
+# Instalar AVRA (Assembler para AVR)
+echo "Instalando AVRA..."
+sudo -E apt-get update -y
+sudo -E apt-get install -y avra
+check_install avra
+
+# --- Instalar a versão 1.3.0 do SourceForge ---
+echo "Instalando AVRA 1.3.0 (SourceForge)..."
+sudo apt-get install -y build-essential wget bzip2
+cd /tmp
+wget https://downloads.sourceforge.net/project/avra/1.3.0/avra-1.3.0.tar.bz2
+tar -xjf avra-1.3.0.tar.bz2
+cd avra-1.3.0
+make
+sudo make install
+check_install avra
 
 # Instalar Ollama
 echo "Instalando Ollama..."
