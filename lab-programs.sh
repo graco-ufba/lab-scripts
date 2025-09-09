@@ -20,6 +20,14 @@ sudo systemctl disable --now apt-daily.service apt-daily.timer apt-daily-upgrade
 sudo -E apt-get update -y
 sudo -E apt-get install -y software-properties-common apt-transport-https ca-certificates curl wget gnupg
 
+# Instalar Quarto
+echo "Instalando Quarto..."
+if ! command -v quarto &>/dev/null; then
+    wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.8.24/quarto-1.8.24-linux-amd64.deb -O /tmp/quarto.deb
+    sudo -E dpkg -i /tmp/quarto.deb || sudo -E apt-get -f install -y
+    rm /tmp/quarto.deb
+fi
+check_install quarto
 
 # Função para verificar instalação
 check_install() {
