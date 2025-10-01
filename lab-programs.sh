@@ -68,6 +68,20 @@ sudo chmod 4755 /opt/Termius/chrome-sandbox
 check_install termius
 echo "Atualizacao finalizada."
 
+# Removendo Termius
+#echo "Removendo Termius..."
+
+#if dpkg -l | grep -q termius-app; then
+#    sudo apt-get purge -y termius-app
+#    sudo apt-get autoremove -y
+#else
+#    echo "Pacote termius-app não encontrado. Removendo manualmente..."
+#    sudo rm -rf /opt/Termius
+#    sudo rm -f /usr/share/applications/termius.desktop
+#    sudo rm -f /usr/bin/termius
+#fi
+
+#echo "Termius removido com sucesso."
 
 # Instalar Jupyter
 echo "Instalando Jupyter..."
