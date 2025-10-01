@@ -21,10 +21,11 @@ sudo -E apt-get update -y
 sudo -E apt-get install -y software-properties-common apt-transport-https ca-certificates curl wget gnupg
 
 # Instalar Quarto
-echo "Instalando Quarto..."
+QUARTO_VERSION="1.8.24"
+QUARTO_URL="https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb"
 if ! command -v quarto &>/dev/null; then
-    wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.8.24/quarto-1.8.24-linux-amd64.deb -O /tmp/quarto.deb
-    sudo -E dpkg -i /tmp/quarto.deb || sudo -E apt-get -f install -y
+    wget -O /tmp/quarto.deb "$QUARTO_URL"
+    sudo dpkg -i /tmp/quarto.deb || sudo apt-get -f install -y
     rm /tmp/quarto.deb
 fi
 check_install quarto
@@ -55,6 +56,18 @@ sudo -E apt-get install -y clamav freshclam clamtk
 sudo freshclam  # Atualiza as definições de vírus
 check_install clamscan
 check_install clamtk
+
+# Instalar Termius
+TERMIUS_URL="https://www.termius.com/download/linux/Termius.deb"
+if [ ! -f ./termius_current.deb ]; then
+    wget -O termius_current.deb "$TERMIUS_URL"
+fi
+sudo dpkg -i ./termius_current.deb || sudo apt-get -f install -y
+sudo chown root:root /opt/Termius/chrome-sandbox
+sudo chmod 4755 /opt/Termius/chrome-sandbox
+check_install termius
+echo "Atualizacao finalizada."
+
 
 # Instalar Jupyter
 echo "Instalando Jupyter..."
