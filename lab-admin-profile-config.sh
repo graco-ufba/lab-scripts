@@ -1,7 +1,7 @@
 #!/bin/bash
 
 USUARIO="NATI"
-SENHA="@Set2025"
+SENHA="@Luar2025"
 
 # Verifica se o usuário já existe
 if id "$USUARIO" &> /dev/null; then
