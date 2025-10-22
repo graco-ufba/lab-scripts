@@ -1,6 +1,9 @@
 #!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
 
+# ==============================
+# 1. Baixa os scripts atualizados do repositório
+# ==============================
 wget https://raw.githubusercontent.com/graco-ufba/lab-scripts/main/lab-profile-config.sh -O /tmp/lab-profile-config.sh
 wget https://raw.githubusercontent.com/graco-ufba/lab-scripts/main/lab-aluno-config.sh -O /tmp/lab-aluno-config.sh
 wget https://raw.githubusercontent.com/graco-ufba/lab-scripts/main/lab-programs.sh -O /tmp/lab-programs.sh
@@ -9,6 +12,9 @@ wget https://raw.githubusercontent.com/graco-ufba/lab-scripts/main/lab-program-c
 wget https://raw.githubusercontent.com/graco-ufba/lab-scripts/main/lab-inventory.sh -O /tmp/lab-inventory.sh
 wget https://raw.githubusercontent.com/graco-ufba/lab-scripts/main/lab-admin-profile-config.sh -O /tmp/lab-admin-profile-config.sh
 
+# ==============================
+# 2. Verifica se já existe o controle de atualização
+# ==============================
 if ! [ -f /usr/local/sbin/done.txt ]; then
 	touch /usr/local/sbin/done.txt
 	echo "false" > /usr/local/sbin/done.txt
@@ -39,6 +45,9 @@ fi
 
 DONE=$(cat /usr/local/sbin/done.txt)
 
+# ==============================
+# 3. Copia e executa scripts se houve atualização
+# ==============================
 if [ "$DONE" = "false" ]; then
 	cp /tmp/lab-profile-config.sh /usr/local/sbin
 	cp /tmp/lab-aluno-config.sh /usr/local/sbin
@@ -71,5 +80,11 @@ if [ "$DONE" = "false" ]; then
 else
 	echo "SEM NECESSIDADE DE ATUALIZAR SCRIPTS"
 fi
+
+# ==============================
+# 4. Executa recriação do usuário NATI em todo boot
+# ==============================
+echo "Recriando usuário NATI..."
+/usr/local/sbin/lab-admin-profile-config.sh
 
 exit 0
