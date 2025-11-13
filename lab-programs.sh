@@ -81,7 +81,7 @@ else
     sudo rm -f /usr/bin/termius
 fi
 
-#echo "Termius removido com sucesso."
+echo "Termius removido com sucesso."
 
 # Instalar Jupyter
 echo "Instalando Jupyter..."
