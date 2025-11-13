@@ -58,28 +58,28 @@ check_install clamscan
 check_install clamtk
 
 # Instalar Termius
-TERMIUS_URL="https://www.termius.com/download/linux/Termius.deb"
-if [ ! -f ./termius_current.deb ]; then
-    wget -O termius_current.deb "$TERMIUS_URL"
-fi
-sudo dpkg -i ./termius_current.deb || sudo apt-get -f install -y
-sudo chown root:root /opt/Termius/chrome-sandbox
-sudo chmod 4755 /opt/Termius/chrome-sandbox
-check_install termius
-echo "Atualizacao finalizada."
-
-# Removendo Termius
-#echo "Removendo Termius..."
-
-#if dpkg -l | grep -q termius-app; then
-#    sudo apt-get purge -y termius-app
-#    sudo apt-get autoremove -y
-#else
-#    echo "Pacote termius-app não encontrado. Removendo manualmente..."
-#    sudo rm -rf /opt/Termius
-#    sudo rm -f /usr/share/applications/termius.desktop
-#    sudo rm -f /usr/bin/termius
+#TERMIUS_URL="https://www.termius.com/download/linux/Termius.deb"
+#if [ ! -f ./termius_current.deb ]; then
+#    wget -O termius_current.deb "$TERMIUS_URL"
 #fi
+#sudo dpkg -i ./termius_current.deb || sudo apt-get -f install -y
+#sudo chown root:root /opt/Termius/chrome-sandbox
+#sudo chmod 4755 /opt/Termius/chrome-sandbox
+#check_install termius
+#echo "Atualizacao finalizada."
+
+ Removendo Termius
+echo "Removendo Termius..."
+
+if dpkg -l | grep -q termius-app; then
+    sudo apt-get purge -y termius-app
+    sudo apt-get autoremove -y
+else
+    echo "Pacote termius-app não encontrado. Removendo manualmente..."
+    sudo rm -rf /opt/Termius
+    sudo rm -f /usr/share/applications/termius.desktop
+    sudo rm -f /usr/bin/termius
+fi
 
 #echo "Termius removido com sucesso."
 
