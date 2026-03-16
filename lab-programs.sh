@@ -235,7 +235,7 @@ check_install netbeans
 # Instalar Greenfoot via Snap
 echo "Instalando Greenfoot..."
 sudo snap install greenfoot
-check_install netbeans
+check_install greenfoot
 
 # Instalar SimulIDE
 echo "Instalando SimulIDE..."
