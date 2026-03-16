@@ -232,6 +232,11 @@ sudo -E apt-get install -y openjdk-17-jdk
 sudo snap install netbeans --classic
 check_install netbeans
 
+# Instalar Greenfoot via Snap
+echo "Instalando Greenfoot..."
+sudo snap install greenfoot
+check_install netbeans
+
 # Instalar SimulIDE
 echo "Instalando SimulIDE..."
 sudo -E apt-get install -y fuse libfuse2 libqt5core5a libqt5gui5 libqt5widgets5 libqt5network5 libqt5svg5 qtbase5-dev qttools5-dev-tools libqt5serialport5 libqt5serialport5-dev
