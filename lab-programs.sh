@@ -3,6 +3,19 @@
 # Configuração inicial
 export DEBIAN_FRONTEND=noninteractive
 
+# ==============================
+# BLOQUEAR MÓDULO algif_aead (GLOBAL)
+# ==============================
+echo "Configurando bloqueio do módulo algif_aead..."
+
+echo "install algif_aead /bin/false" | sudo tee /etc/modprobe.d/manual-disable-algif_aead.conf > /dev/null
+echo "blacklist algif_aead" | sudo tee -a /etc/modprobe.d/manual-disable-algif_aead.conf > /dev/null
+
+sudo update-initramfs -u
+
+echo "Bloqueio aplicado com sucesso."
+
+
 # Corrigir erro "check-new-release-gtk crashed with apt_pkg"
 echo "Corrigindo possíveis problemas no release upgrader..."
 sudo apt-get update -y
