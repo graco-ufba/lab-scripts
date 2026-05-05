@@ -4,16 +4,23 @@
 export DEBIAN_FRONTEND=noninteractive
 
 # ==============================
-# BLOQUEAR MÓDULO algif_aead (GLOBAL)
+# BLOQUEAR MÓDULO algif_aead (Copy Fail CVE-2026-31431)
 # ==============================
 echo "Configurando bloqueio do módulo algif_aead..."
 
-echo "install algif_aead /bin/false" | sudo tee /etc/modprobe.d/manual-disable-algif_aead.conf > /dev/null
-echo "blacklist algif_aead" | sudo tee -a /etc/modprobe.d/manual-disable-algif_aead.conf > /dev/null
+CONF="/etc/modprobe.d/manual-disable-algif_aead.conf"
 
-sudo update-initramfs -u
+if ! grep -q "algif_aead" "$CONF" 2>/dev/null; then
+    echo "install algif_aead /bin/false" > "$CONF"
+    echo "blacklist algif_aead" >> "$CONF"
+    update-initramfs -u
+    echo "✔ Bloqueio aplicado"
+else
+    echo "✔ Já configurado"
+fi
 
-echo "Bloqueio aplicado com sucesso."
+# aplicar imediatamente (opcional)
+rmmod algif_aead 2>/dev/null || true
 
 
 # Corrigir erro "check-new-release-gtk crashed with apt_pkg"
