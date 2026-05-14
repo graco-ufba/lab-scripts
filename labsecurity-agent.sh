@@ -1,4 +1,3 @@
-cat > /home/NATI/labsecurity-agent.sh << 'EOF'
 #!/bin/bash
 # LabSecurity Agent Script
 # v1.0.0
