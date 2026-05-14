@@ -41,60 +41,30 @@ check_server() {
 }
 
 # ==============================
-# Coletar dados do sistema
+# Coletar dados do sistema (VERSÃO SIMPLIFICADA QUE FUNCIONA)
 # ==============================
 collect_data() {
-    # CPU Usage
-    CPU=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1)
-    if [ -z "$CPU" ] || [ "$CPU" = "id," ]; then
-        CPU=$(mpstat 1 1 2>/dev/null | tail -n 1 | awk '{print 100 - $13}')
-    fi
+    # CPU Usage - garantir formato com ponto
+    CPU=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1 | tr ',' '.')
     if [ -z "$CPU" ]; then
         CPU=50
     fi
-    CPU=$(printf "%.1f" $CPU)
+    CPU=$(printf "%.1f" "$CPU" | tr ',' '.')
     
     # RAM Usage
     MEM_TOTAL=$(free | grep Mem | awk '{print $2}')
     MEM_USED=$(free | grep Mem | awk '{print $3}')
-    RAM=$(echo "scale=1; ($MEM_USED/$MEM_TOTAL)*100" | bc)
+    RAM=$(echo "scale=1; ($MEM_USED/$MEM_TOTAL)*100" | bc | tr ',' '.')
     
     # Disk Usage
-    DISK=$(df -h / | tail -n 1 | awk '{print $5}' | sed 's/%//')
+    DISK=$(df -h / | tail -n1 | awk '{print $5}' | sed 's/%//')
     
-    # Temperature (if available)
-    TEMP=0
-    if command -v sensors &> /dev/null; then
-        TEMP=$(sensors 2>/dev/null | grep "Package id 0" | awk '{print $4}' | cut -d'+' -f2 | cut -d'.' -f1)
-    fi
-    if [ -z "$TEMP" ]; then
-        TEMP=0
-    fi
-    
-    # Uptime
-    UPTIME=$(cat /proc/uptime | awk '{print int($1/3600)}')
-    
-    # Load Average
-    LOAD=$(uptime | awk -F 'load average:' '{print $2}' | cut -d',' -f1 | sed 's/ //g')
-    
-    # Hostname e IP
+    # Hostname
     HOSTNAME=$(hostname)
-    IP_ADDR=$(ip route get 1 | awk '{print $7;exit}')
     
-    # Criar JSON
+    # Criar JSON APENAS COM OS CAMPOS ESSENCIAIS
     cat <<EOF
-{
-    "machine": "$HOSTNAME",
-    "ip": "$IP_ADDR",
-    "timestamp": "$(date '+%Y-%m-%d %H:%M:%S')",
-    "cpu": $CPU,
-    "ram": $RAM,
-    "disk": $DISK,
-    "temperature": $TEMP,
-    "uptime": $UPTIME,
-    "load": "$LOAD",
-    "os": "Linux"
-}
+{"machine":"$HOSTNAME","timestamp":"$(date '+%Y-%m-%d %H:%M:%S')","cpu":$CPU,"ram":$RAM,"disk":$DISK,"os":"Linux"}
 EOF
 }
 
