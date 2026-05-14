@@ -115,8 +115,6 @@ Wants=network.target
 Type=simple
 User=root
 ExecStart=/usr/local/sbin/$SERVICE_NAME.sh
-Restart=always
-RestartSec=10
 StandardOutput=journal
 StandardError=journal
 
