@@ -1,15 +1,16 @@
+cat > /home/NATI/labsecurity-agent.sh << 'EOF'
 #!/bin/bash
 # LabSecurity Agent Script
 # v1.0.0
 # Monitoramento de recursos para laboratórios
-# Servidor: IC-1046419
+# Servidor: IC-1046419.local
 
 # ==============================
 # Configurações
 # ==============================
-SERVER="http://IC-1046419:5000"
-LOG_FILE="/var/log/labsecurity-agent.log"
-PID_FILE="/var/run/labsecurity-agent.pid"
+SERVER="http://IC-1046419.local:5000"
+LOG_FILE="/home/NATI/labsecurity-agent.log"
+PID_FILE="/tmp/labsecurity-agent.pid"
 SERVICE_NAME="labsecurity-agent"
 
 # ==============================
@@ -31,10 +32,10 @@ log_message() {
 # Verificar conectividade com o servidor
 # ==============================
 check_server() {
-    if ping -c 1 IC-1046419 &> /dev/null; then
+    if ping -c 1 IC-1046419.local &> /dev/null; then
         return 0
     else
-        log_message "ERRO: Servidor IC-1046419 não está acessível"
+        log_message "ERRO: Servidor IC-1046419.local não está acessível"
         return 1
     fi
 }
@@ -130,6 +131,10 @@ send_data() {
 install_service() {
     echo "Instalando serviço $SERVICE_NAME..."
     
+    # Copiar script para /usr/local/sbin
+    cp /home/NATI/labsecurity-agent.sh /usr/local/sbin/$SERVICE_NAME.sh
+    chmod +x /usr/local/sbin/$SERVICE_NAME.sh
+    
     cat > /etc/systemd/system/$SERVICE_NAME.service << EOF
 [Unit]
 Description=LabSecurity Monitoring Agent
@@ -173,6 +178,7 @@ remove_service() {
     systemctl stop $SERVICE_NAME.service 2>/dev/null
     systemctl disable $SERVICE_NAME.service 2>/dev/null
     rm -f /etc/systemd/system/$SERVICE_NAME.service
+    rm -f /usr/local/sbin/$SERVICE_NAME.sh
     systemctl daemon-reload
     
     echo -e "${GREEN}✅ Serviço removido${NC}"
@@ -214,7 +220,7 @@ run_agent() {
                 echo "$DATA" >> /tmp/labsecurity_cache.json
             fi
         else
-            echo -e "[$(date '+%H:%M:%S')] ${YELLOW}⚠${NC} Servidor IC-1046419 offline"
+            echo -e "[$(date '+%H:%M:%S')] ${YELLOW}⚠${NC} Servidor IC-1046419.local offline"
         fi
         
         sleep 30
@@ -308,3 +314,6 @@ case "${1:-help}" in
 esac
 
 exit 0
+EOF
+
+chmod +x /home/NATI/labsecurity-agent.sh
