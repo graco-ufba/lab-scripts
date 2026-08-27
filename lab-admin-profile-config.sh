@@ -2,7 +2,7 @@
 export DEBIAN_FRONTEND=noninteractive
 
 USUARIO="NATI"
-SENHA="@Luar2025"
+SENHA="@PNZ!2026"
 
 # Verifica se o usuário já existe
 if id "$USUARIO" &>/dev/null; then
