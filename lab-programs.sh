@@ -88,7 +88,7 @@ check_install clamtk
 #check_install termius
 #echo "Atualizacao finalizada."
 
- Removendo Termius
+ #SRemovendo Termius
 echo "Removendo Termius..."
 
 if dpkg -l | grep -q termius-app; then
