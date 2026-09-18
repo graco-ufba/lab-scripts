@@ -6,6 +6,19 @@ export DEBIAN_FRONTEND=noninteractive
 # ==============================
 # BLOQUEAR MÓDULO algif_aead (Copy Fail CVE-2026-31431)
 # ==============================
+
+# Função para verificar instalação
+check_install() {
+    if command -v $1 &>/dev/null; then
+        echo "[SUCESSO] $1 instalado corretamente"
+        return 0
+    else
+        echo "[ERRO] Falha ao instalar $1"
+        return 1
+    fi
+}
+
+
 echo "Configurando bloqueio do módulo algif_aead..."
 
 CONF="/etc/modprobe.d/manual-disable-algif_aead.conf"
@@ -49,17 +62,6 @@ if ! command -v quarto &>/dev/null; then
     rm /tmp/quarto.deb
 fi
 check_install quarto
-
-# Função para verificar instalação
-check_install() {
-    if command -v $1 &>/dev/null; then
-        echo "[SUCESSO] $1 instalado corretamente"
-        return 0
-    else
-        echo "[ERRO] Falha ao instalar $1"
-        return 1
-    fi
-}
 
 # Atualização do sistema
 echo "Atualizando sistema..."
