@@ -2,6 +2,22 @@
 export DEBIAN_FRONTEND=noninteractive
 
 # ==============================
+# Sincronização de data e hora
+# ==============================
+echo "Configurando sincronização de data e hora..."
+
+sudo timedatectl set-ntp true
+sudo timedatectl set-timezone America/Bahia
+sudo timedatectl set-local-rtc 0
+sudo systemctl restart systemd-timesyncd
+
+echo "Status da sincronização:"
+timedatectl status
+
+echo "✅ Sincronização de tempo configurada."
+
+
+# ==============================
 # 1. Baixa os scripts atualizados do repositório
 # ==============================
 echo "========================================="
