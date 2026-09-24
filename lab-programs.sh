@@ -1,12 +1,31 @@
 #!/bin/bash
+# =====================================================================
+#  lab-programs.sh
+#  v4.0.0
+#
+#  Mudanças em relação à versão anterior:
+#    - Adiciona "fix de ambiente" (repositórios quebrados) com flag
+#    - Fix do Firefox isolado com flag própria
+#    - Reaplica lab-block.sh se houver reserva ativa no fim
+#    - Log completo em /var/log/lab-programs.log
+#    - Não roda fix durante reserva ativa
+# =====================================================================
 
 export DEBIAN_FRONTEND=noninteractive
+
+LOG="/var/log/lab-programs.log"
+exec >> "$LOG" 2>&1
+
+echo ""
+echo "[$(date '+%F %T')] ==============================================="
+echo "[$(date '+%F %T')] LAB-PROGRAMS INICIADO"
+echo "[$(date '+%F %T')] ==============================================="
 
 # =====================================================================
 # Funcao para verificar instalacao
 # =====================================================================
 check_install() {
-    if command -v $1 &>/dev/null; then
+    if command -v "$1" &>/dev/null; then
         echo "[SUCESSO] $1 instalado corretamente"
         return 0
     else
@@ -16,8 +35,46 @@ check_install() {
 }
 
 # =====================================================================
+# FIX DE AMBIENTE — RODA UMA VEZ
+#   - Remove repositórios duplicados (vscode.list)
+#   - Remove PPA do SWI-Prolog quebrado
+#   - Corrige APT (--fix-broken, autoremove, clean, update)
+#   - Se houver reserva ativa, adia para o próximo boot
+# =====================================================================
+FIX_ENV_FLAG="/usr/local/sbin/.fix-ambiente-done"
+
+if [ ! -f "$FIX_ENV_FLAG" ]; then
+    echo ""
+    echo "=================================================="
+    echo "  FIX DE AMBIENTE (uma vez)"
+    echo "=================================================="
+
+    if [ -f /run/lab-block.args ]; then
+        echo "  ⚠️  Reserva ativa — adiando fix para o próximo boot"
+    else
+        echo "  → Removendo repositórios duplicados..."
+        rm -f /etc/apt/sources.list.d/vscode.list
+
+        echo "  → Removendo PPA do SWI-Prolog (se existir)..."
+        add-apt-repository -r -y ppa:swi-prolog/stable 2>/dev/null || true
+        rm -f /etc/apt/sources.list.d/swi-prolog* 2>/dev/null
+        rm -f /etc/apt/trusted.gpg.d/*swi-prolog* 2>/dev/null
+
+        echo "  → Corrigindo APT..."
+        apt --fix-broken install -y 2>&1 | tail -3
+        apt autoremove -y 2>&1 | tail -3
+        apt clean
+        apt update 2>&1 | tail -3
+
+        touch "$FIX_ENV_FLAG"
+        echo "  ✅ Fix de ambiente concluído — flag: $FIX_ENV_FLAG"
+    fi
+fi
+
+# =====================================================================
 # 0) Bloquear modulo algif_aead
 # =====================================================================
+echo ""
 echo "Configurando bloqueio do modulo algif_aead..."
 CONF="/etc/modprobe.d/manual-disable-algif_aead.conf"
 if ! grep -q "algif_aead" "$CONF" 2>/dev/null; then
@@ -155,7 +212,7 @@ else
 fi
 
 # =====================================================================
-# 8) Docker (verifica binario + grupo)
+# 8) Docker
 # =====================================================================
 USERNAME=${SUDO_USER:-$USER}
 DOCKER_OK=false
@@ -357,7 +414,7 @@ else
 fi
 
 # =====================================================================
-# 19) PostgreSQL 17 (verifica versao especifica)
+# 19) PostgreSQL 17
 # =====================================================================
 if ! dpkg -l | grep -q postgresql-17; then
     echo "→ Instalando PostgreSQL 17..."
@@ -667,58 +724,88 @@ else
 fi
 
 # =====================================================================
-# 38) Firefox (.deb) — NO FINAL
+# 38) Firefox (.deb) — BLOCO ISOLADO COM FLAG
+#     Roda uma vez, e só se NÃO houver reserva ativa
 # =====================================================================
-echo "→ Verificando Firefox (.deb)..."
+FIX_FIREFOX_FLAG="/usr/local/sbin/.fix-firefox-done"
 
-# Se já é .deb (ELF), pula
-if file /usr/bin/firefox 2>/dev/null | grep -q "ELF"; then
-    echo "✅ Firefox .deb já instalado. Pulando."
-else
-    echo "→ Instalando Firefox (.deb)..."
+if [ ! -f "$FIX_FIREFOX_FLAG" ]; then
+    echo ""
+    echo "=================================================="
+    echo "  FIX DO FIREFOX (snap → .deb) — uma vez"
+    echo "=================================================="
 
-    # 1. Remove o Snap (se existir)
-    if snap list 2>/dev/null | grep -q firefox; then
-        echo "→ Removendo Firefox Snap..."
-        snap remove firefox 2>/dev/null || true
-        sleep 2
-    fi
+    if [ -f /run/lab-block.args ]; then
+        echo "  ⚠️  Reserva ativa — adiando fix para o próximo boot"
+    else
+        # Se já é .deb (ELF), marca a flag e pula
+        if file /usr/bin/firefox 2>/dev/null | grep -q "ELF"; then
+            echo "  ✅ Firefox já é .deb. Marcando flag."
+            touch "$FIX_FIREFOX_FLAG"
+        else
+            echo "  → Convertendo Firefox snap → .deb..."
 
-    # 2. Remove o pacote wrapper do apt
-    if dpkg -l | grep -q "^ii  firefox"; then
-        apt remove -y firefox 2>/dev/null || true
-        apt autoremove -y 2>/dev/null || true
-    fi
+            # 1. Remove o snap
+            if snap list 2>/dev/null | grep -q firefox; then
+                echo "    - Removendo snap..."
+                snap remove firefox 2>/dev/null || true
+                sleep 2
+            fi
 
-    # 3. Bloqueia reinstalacao do snap
-    mkdir -p /etc/apt/preferences.d
-    cat > /etc/apt/preferences.d/firefox-no-snap <<'EOF'
+            # 2. Remove resíduos do snap
+            rm -rf /snap/firefox 2>/dev/null
+            rm -rf /var/snap/firefox 2>/dev/null
+
+            # 3. Remove o wrapper do apt
+            if dpkg -l | grep -q "^ii  firefox"; then
+                apt remove -y firefox 2>/dev/null || true
+                apt autoremove -y 2>/dev/null || true
+            fi
+
+            # 4. Bloqueia reinstalação do snap
+            mkdir -p /etc/apt/preferences.d
+            cat > /etc/apt/preferences.d/firefox-no-snap <<'EOF'
 Package: firefox*
 Pin: release o=Ubuntu*
 Pin-Priority: -1
 EOF
 
-    # 4. Adiciona o PPA da Mozilla
-    add-apt-repository -y ppa:mozillateam/ppa 2>/dev/null
-    apt-get update -y
+            # 5. Adiciona o PPA da Mozilla
+            add-apt-repository -y ppa:mozillateam/ppa 2>/dev/null
+            apt-get update -y
 
-    # 5. Prioriza o PPA
-    cat > /etc/apt/preferences.d/mozilla-firefox <<'EOF'
+            # 6. Prioriza o PPA
+            cat > /etc/apt/preferences.d/mozilla-firefox <<'EOF'
 Package: firefox*
 Pin: release o=LP-PPA-mozillateam
 Pin-Priority: 1001
 EOF
 
-    # 6. Instala o .deb
-    DEBIAN_FRONTEND=noninteractive apt-get install -y firefox --allow-downgrades
+            # 7. Instala o .deb
+            DEBIAN_FRONTEND=noninteractive apt-get install -y firefox --allow-downgrades
 
-    # 7. Valida
-    if file /usr/bin/firefox 2>/dev/null | grep -q "ELF"; then
-        echo "[SUCESSO] Firefox .deb instalado"
-    else
-        echo "[AVISO] Firefox ainda e wrapper (snap)"
+            # 8. Valida
+            if file /usr/bin/firefox 2>/dev/null | grep -q "ELF"; then
+                echo "    ✅ Firefox .deb instalado"
+                touch "$FIX_FIREFOX_FLAG"
+            else
+                echo "    ⚠️  Firefox ainda é wrapper (snap). Não marcando flag para tentar de novo."
+            fi
+        fi
     fi
-    check_install firefox
+fi
+
+# =====================================================================
+# 39) Reaplica bloqueio se houver reserva ativa
+#     (garante que o Firefox .deb já está bloqueado)
+# =====================================================================
+if [ -f /run/lab-block.args ]; then
+    ARGS="$(cat /run/lab-block.args)"
+    echo ""
+    echo "[39] Reaplicando bloqueio: $ARGS"
+    if [ -x /usr/local/sbin/lab-block.sh ]; then
+        /usr/local/sbin/lab-block.sh "$ARGS"
+    fi
 fi
 
 # =====================================================================
@@ -727,6 +814,7 @@ fi
 echo ""
 echo "=================================================="
 echo " INSTALACAO CONCLUIDA"
+echo " $(date '+%F %T')"
 echo "=================================================="
 
 exit 0
