@@ -586,17 +586,64 @@ else
 fi
 
 # =====================================================================
-# 30) Python
 # =====================================================================
-if [ ! -f /usr/bin/python3.10 ] || [ ! -f /usr/bin/python3.11 ]; then
-    echo "→ Configurando Python..."
-    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
-    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2
-    apt-get install -y python3.10-venv python3.11-venv
-else
-    echo "✅ Python já configurado. Pulando."
-fi
+# 30) Python + ambiente do laboratório
+# =====================================================================
 
+echo "→ Configurando Python para o laboratório..."
+
+apt-get install -y python3 python3-pip python3-venv
+
+# Escolhe a melhor versão disponível sem alterar o python3 do sistema.
+PYTHON_BIN=""
+
+for CANDIDATE in python3.12 python3.11 python3.10 python3; do
+    if command -v "$CANDIDATE" >/dev/null 2>&1; then
+        PYTHON_BIN="$(command -v "$CANDIDATE")"
+        break
+    fi
+done
+
+if [ -z "$PYTHON_BIN" ]; then
+    echo "[ERRO] Nenhum Python compatível encontrado."
+else
+    echo "✅ Python selecionado: $PYTHON_BIN"
+    "$PYTHON_BIN" --version
+
+    LAB_PYTHON="/opt/python-lab"
+
+    # Cria ambiente virtual compartilhado
+    if [ ! -x "$LAB_PYTHON/bin/python" ]; then
+        echo "→ Criando ambiente Python em $LAB_PYTHON..."
+        rm -rf "$LAB_PYTHON"
+        "$PYTHON_BIN" -m venv "$LAB_PYTHON"
+    else
+        echo "✅ Ambiente Python já existe."
+    fi
+
+    # Atualiza pip dentro do ambiente
+    "$LAB_PYTHON/bin/python" -m pip install --upgrade pip
+
+    # Instala dependências da disciplina
+    echo "→ Instalando pygame e Pillow..."
+    "$LAB_PYTHON/bin/python" -m pip install --upgrade pygame Pillow
+
+    # Atalho para os alunos
+    ln -sf "$LAB_PYTHON/bin/python" /usr/local/bin/python-lab
+    ln -sf "$LAB_PYTHON/bin/pip" /usr/local/bin/pip-lab
+
+    # Só cria "python" se não houver um comando próprio do laboratório.
+    if [ ! -e /usr/local/bin/python ]; then
+        ln -s "$LAB_PYTHON/bin/python" /usr/local/bin/python
+    fi
+
+    # Teste real das bibliotecas
+    if "$LAB_PYTHON/bin/python" -c "import pygame; from PIL import Image; print('pygame:', pygame.version.ver); print('Pillow: OK')" 2>/dev/null; then
+        echo "[SUCESSO] pygame e Pillow instalados corretamente"
+    else
+        echo "[ERRO] Falha ao importar pygame ou Pillow"
+    fi
+fi
 # =====================================================================
 # 31) Snaps de IDEs
 # =====================================================================
