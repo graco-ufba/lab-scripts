@@ -855,6 +855,111 @@ if [ -f /run/lab-block.args ]; then
     fi
 fi
 
+# ==========================================
+# 40) Docker Desktop
+# ==========================================
+
+echo "========================================="
+echo " Instalando Docker Desktop..."
+echo "========================================="
+
+if ! dpkg -l | grep -q docker-desktop; then
+
+    wget -O /tmp/docker-desktop-amd64.deb \
+        https://desktop.docker.com/linux/main/amd64/docker-desktop-amd64.deb
+
+    apt install -y /tmp/docker-desktop-amd64.deb
+
+    rm -f /tmp/docker-desktop-amd64.deb
+
+    echo "✅ Docker Desktop instalado"
+
+else
+    echo "✅ Docker Desktop já está instalado"
+
+fi
+
+# ==========================================
+# 41) SDKMAN
+# ==========================================
+
+echo "========================================="
+echo " Instalando SDKMAN..."
+echo "========================================="
+
+if [ ! -d /opt/sdkman ]; then
+
+    rm -rf /tmp/sdkman
+
+    git clone https://github.com/sdkman/sdkman-cli.git /tmp/sdkman
+
+    mv /tmp/sdkman /opt/sdkman
+
+    chown -R root:root /opt/sdkman
+    chmod -R 755 /opt/sdkman
+
+    echo "✅ SDKMAN instalado em /opt/sdkman"
+
+else
+
+    echo "✅ SDKMAN já está instalado"
+
+fi
+
+# ==========================================
+# 42) NVM
+# ==========================================
+
+echo "========================================="
+echo " Instalando NVM..."
+echo "========================================="
+
+if [ ! -d /opt/nvm ]; then
+
+    mkdir -p /opt/nvm
+
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.7/install.sh \
+        | NVM_DIR=/opt/nvm bash
+
+    chown -R root:root /opt/nvm
+    chmod -R 755 /opt/nvm
+
+    echo "✅ NVM instalado em /opt/nvm"
+
+else
+
+    echo "✅ NVM já está instalado"
+
+fi
+
+# ==========================================
+# 43) CONDA / MINIFORGE
+# ==========================================
+
+echo "========================================="
+echo " Instalando Conda (Miniforge)..."
+echo "========================================="
+
+if [ ! -d /opt/miniforge3 ]; then
+
+    wget -O /tmp/Miniforge3.sh \
+        https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
+
+    bash /tmp/Miniforge3.sh -b -p /opt/miniforge3
+
+    rm -f /tmp/Miniforge3.sh
+
+    chown -R root:root /opt/miniforge3
+    chmod -R 755 /opt/miniforge3
+
+    echo "✅ Conda instalado em /opt/miniforge3"
+
+else
+
+    echo "✅ Conda já está instalado"
+
+fi
+
 # =====================================================================
 # FIM
 # =====================================================================
