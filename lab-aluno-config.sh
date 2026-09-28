@@ -20,6 +20,28 @@ if [[ "$USER" == "aluno" ]]; then
     echo 'export PATH="/opt/android-studio/bin:/opt/Android/Sdk/platform-tools:$PATH"' >> /home/aluno/.bashrc
     rm -f /opt/flutter/bin/cache/lockfile
 
+  # Ferramentas instaladas pelo lab-programs.sh
+    if [ -d /opt/nvm ]; then
+        chown -R aluno:aluno /opt/nvm
+    fi
+    if [ -d /opt/sdkman ]; then
+        chown -R aluno:aluno /opt/sdkman
+    fi
+    if [ -d /opt/miniforge3 ]; then
+        chown -R aluno:aluno /opt/miniforge3
+    fi
+
+    # Docker Desktop / Docker Engine
+    if getent group docker >/dev/null 2>&1; then
+        usermod -aG docker aluno
+    fi
+
+    # Habilita o Docker Desktop para a sessão do aluno, quando o
+    # barramento de usuário já estiver disponível.
+    if [ -d "/run/user/$(id -u aluno)" ]; then
+        runuser -u aluno -- env             XDG_RUNTIME_DIR="/run/user/$(id -u aluno)"             DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u aluno)/bus"             systemctl --user enable docker-desktop.service 2>/dev/null || true
+    fi
+
     chown -R aluno:aluno /opt/flutter /opt/nand2tetris /opt/VMs
 
     mkdir -p /home/$USER/Unity/Hub
