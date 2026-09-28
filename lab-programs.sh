@@ -855,6 +855,200 @@ if [ -f /run/lab-block.args ]; then
     fi
 fi
 
+# ---------------------------------------------------------------------
+# 40) Docker Desktop
+# ---------------------------------------------------------------------
+if ! dpkg-query -W -f='${Status}' docker-desktop 2>/dev/null | grep -q "install ok installed"; then
+    echo "→ Instalando Docker Desktop..."
+
+    apt-get update -y
+    apt-get install -y ca-certificates curl wget gnome-terminal pass
+
+    DOCKER_DESKTOP_DEB="/tmp/docker-desktop-amd64.deb"
+
+    wget -O "$DOCKER_DESKTOP_DEB"         "https://desktop.docker.com/linux/main/amd64/docker-desktop-amd64.deb"
+
+    if [ -s "$DOCKER_DESKTOP_DEB" ]; then
+        apt-get install -y "$DOCKER_DESKTOP_DEB"
+        rm -f "$DOCKER_DESKTOP_DEB"
+        check_install docker-desktop
+    else
+        echo "[ERRO] Não foi possível baixar o Docker Desktop."
+        rm -f "$DOCKER_DESKTOP_DEB"
+    fi
+else
+    echo "✅ Docker Desktop já instalado. Pulando."
+fi
+
+# ---------------------------------------------------------------------
+# 41) SDKMAN
+# ---------------------------------------------------------------------
+SDKMAN_DIR="/opt/sdkman"
+
+if [ ! -f "$SDKMAN_DIR/bin/sdkman-init.sh" ]; then
+    echo "→ Instalando SDKMAN..."
+
+    rm -rf /tmp/sdkman
+    git clone --depth 1 https://github.com/sdkman/sdkman-cli.git /tmp/sdkman
+
+    rm -rf "$SDKMAN_DIR"
+    mv /tmp/sdkman "$SDKMAN_DIR"
+
+    chown -R "$LAB_USER:$LAB_GROUP" "$SDKMAN_DIR"
+    chmod -R u+rwX "$SDKMAN_DIR"
+
+    echo "[SUCESSO] SDKMAN instalado em $SDKMAN_DIR"
+else
+    echo "✅ SDKMAN já instalado. Pulando."
+fi
+
+# ---------------------------------------------------------------------
+# 42) NVM
+# ---------------------------------------------------------------------
+NVM_DIR="/opt/nvm"
+
+if [ ! -f "$NVM_DIR/nvm.sh" ]; then
+    echo "→ Instalando NVM..."
+
+    rm -rf "$NVM_DIR"
+    mkdir -p "$NVM_DIR"
+
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh         | NVM_DIR="$NVM_DIR" bash
+
+    if [ -f "$NVM_DIR/nvm.sh" ]; then
+        chown -R "$LAB_USER:$LAB_GROUP" "$NVM_DIR"
+        chmod -R u+rwX "$NVM_DIR"
+        echo "[SUCESSO] NVM instalado em $NVM_DIR"
+    else
+        echo "[ERRO] Falha ao instalar NVM."
+    fi
+else
+    echo "✅ NVM já instalado. Pulando."
+fi
+
+# ---------------------------------------------------------------------
+# 43) Conda / Miniforge
+# ---------------------------------------------------------------------
+CONDA_DIR="/opt/miniforge3"
+MINIFORGE_INSTALLER="/tmp/Miniforge3.sh"
+
+if [ ! -f "$CONDA_DIR/bin/conda" ]; then
+    echo "→ Instalando Conda (Miniforge)..."
+
+    rm -rf "$CONDA_DIR"
+    rm -f "$MINIFORGE_INSTALLER"
+
+    wget -O "$MINIFORGE_INSTALLER"         "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh"
+
+    if [ -s "$MINIFORGE_INSTALLER" ]; then
+        bash "$MINIFORGE_INSTALLER" -b -p "$CONDA_DIR"
+        rm -f "$MINIFORGE_INSTALLER"
+
+        if [ -f "$CONDA_DIR/bin/conda" ]; then
+            chown -R "$LAB_USER:$LAB_GROUP" "$CONDA_DIR"
+            chmod -R u+rwX "$CONDA_DIR"
+            echo "[SUCESSO] Conda instalado em $CONDA_DIR"
+        else
+            echo "[ERRO] Falha ao instalar Conda."
+        fi
+    else
+        echo "[ERRO] Não foi possível baixar o instalador do Miniforge."
+        rm -f "$MINIFORGE_INSTALLER"
+    fi
+else
+    echo "✅ Conda já instalado. Pulando."
+fi
+
+# ---------------------------------------------------------------------
+# 44) Ambiente global para NVM, SDKMAN e Conda
+# ---------------------------------------------------------------------
+echo "→ Configurando ambiente global das ferramentas..."
+
+cat > /etc/profile.d/lab-development-tools.sh <<'EOF'
+# Ferramentas de desenvolvimento do laboratório
+
+# NVM
+export NVM_DIR="/opt/nvm"
+if [ -s "/opt/nvm/nvm.sh" ]; then
+    . "/opt/nvm/nvm.sh"
+fi
+if [ -s "/opt/nvm/bash_completion" ]; then
+    . "/opt/nvm/bash_completion"
+fi
+
+# SDKMAN
+export SDKMAN_DIR="/opt/sdkman"
+if [ -s "/opt/sdkman/bin/sdkman-init.sh" ]; then
+    . "/opt/sdkman/bin/sdkman-init.sh"
+fi
+
+# Conda
+if [ -f "/opt/miniforge3/etc/profile.d/conda.sh" ]; then
+    . "/opt/miniforge3/etc/profile.d/conda.sh"
+fi
+EOF
+
+chmod 644 /etc/profile.d/lab-development-tools.sh
+
+# O /home/aluno é recriado a partir de /etc/skel pelo lab-aluno-config.sh.
+# Por isso, mantemos as inicializações também no .bashrc do skeleton.
+SKEL_BASHRC="/etc/skel/.bashrc"
+
+if ! grep -q 'Ferramentas de desenvolvimento do laboratório' "$SKEL_BASHRC" 2>/dev/null; then
+    cat >> "$SKEL_BASHRC" <<'EOF'
+
+# Ferramentas de desenvolvimento do laboratório
+
+# NVM
+export NVM_DIR="/opt/nvm"
+if [ -s "/opt/nvm/nvm.sh" ]; then
+    . "/opt/nvm/nvm.sh"
+fi
+
+# SDKMAN
+export SDKMAN_DIR="/opt/sdkman"
+if [ -s "/opt/sdkman/bin/sdkman-init.sh" ]; then
+    . "/opt/sdkman/bin/sdkman-init.sh"
+fi
+
+# Conda
+if [ -f "/opt/miniforge3/etc/profile.d/conda.sh" ]; then
+    . "/opt/miniforge3/etc/profile.d/conda.sh"
+fi
+EOF
+fi
+
+echo "[SUCESSO] Ambiente de NVM, SDKMAN e Conda configurado."
+
+# ---------------------------------------------------------------------
+# 45) Validação
+# ---------------------------------------------------------------------
+echo ""
+echo "→ Validando ferramentas..."
+
+if [ -f "/opt/nvm/nvm.sh" ]; then
+    echo "[SUCESSO] NVM: /opt/nvm"
+else
+    echo "[ERRO] NVM não encontrado."
+fi
+
+if [ -f "/opt/sdkman/bin/sdkman-init.sh" ]; then
+    echo "[SUCESSO] SDKMAN: /opt/sdkman"
+else
+    echo "[ERRO] SDKMAN não encontrado."
+fi
+
+if [ -x "/opt/miniforge3/bin/conda" ]; then
+    echo "[SUCESSO] Conda: /opt/miniforge3"
+else
+    echo "[ERRO] Conda não encontrado."
+fi
+
+if dpkg-query -W -f='${Status}' docker-desktop 2>/dev/null | grep -q "install ok installed"; then
+    echo "[SUCESSO] Docker Desktop instalado."
+else
+    echo "[ERRO] Docker Desktop não está instalado."
+fi
 
 # =====================================================================
 # FIM
