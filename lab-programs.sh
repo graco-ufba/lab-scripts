@@ -771,7 +771,18 @@ else
 fi
 
 # =====================================================================
-# 38) Firefox (.deb) — BLOCO ISOLADO COM FLAG
+# 38) Inkscape
+# =====================================================================
+if ! command -v inkscape &>/dev/null; then
+    echo "→ Instalando Inkscape..."
+    apt-get install -y inkscape
+    check_install inkscape
+else
+    echo "✅ Inkscape já instalado. Pulando."
+fi
+
+# =====================================================================
+# 39) Firefox (.deb) — BLOCO ISOLADO COM FLAG
 #     Roda uma vez, e só se NÃO houver reserva ativa
 # =====================================================================
 FIX_FIREFOX_FLAG="/usr/local/sbin/.fix-firefox-done"
@@ -843,7 +854,7 @@ EOF
 fi
 
 # =====================================================================
-# 39) Reaplica bloqueio se houver reserva ativa
+# 40) Reaplica bloqueio se houver reserva ativa
 #     (garante que o Firefox .deb já está bloqueado)
 # =====================================================================
 if [ -f /run/lab-block.args ]; then
@@ -856,7 +867,7 @@ if [ -f /run/lab-block.args ]; then
 fi
 
 # ---------------------------------------------------------------------
-# 40) Docker Desktop
+# 41) Docker Desktop
 # ---------------------------------------------------------------------
 if ! dpkg-query -W -f='${Status}' docker-desktop 2>/dev/null | grep -q "install ok installed"; then
     echo "→ Instalando Docker Desktop..."
@@ -881,7 +892,7 @@ else
 fi
 
 # ---------------------------------------------------------------------
-# 41) SDKMAN
+# 42) SDKMAN
 # ---------------------------------------------------------------------
 SDKMAN_DIR="/opt/sdkman"
 
@@ -903,7 +914,7 @@ else
 fi
 
 # ---------------------------------------------------------------------
-# 42) NVM
+# 43) NVM
 # ---------------------------------------------------------------------
 NVM_DIR="/opt/nvm"
 
@@ -927,7 +938,7 @@ else
 fi
 
 # ---------------------------------------------------------------------
-# 43) Conda / Miniforge
+# 44) Conda / Miniforge
 # ---------------------------------------------------------------------
 CONDA_DIR="/opt/miniforge3"
 MINIFORGE_INSTALLER="/tmp/Miniforge3.sh"
@@ -960,7 +971,7 @@ else
 fi
 
 # ---------------------------------------------------------------------
-# 44) Ambiente global para NVM, SDKMAN e Conda
+# 45) Ambiente global para NVM, SDKMAN e Conda
 # ---------------------------------------------------------------------
 echo "→ Configurando ambiente global das ferramentas..."
 
@@ -1021,7 +1032,7 @@ fi
 echo "[SUCESSO] Ambiente de NVM, SDKMAN e Conda configurado."
 
 # ---------------------------------------------------------------------
-# 45) Validação
+# 46) Validação
 # ---------------------------------------------------------------------
 echo ""
 echo "→ Validando ferramentas..."
